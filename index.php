@@ -28,7 +28,7 @@ $show_complete_tasks = rand(0, 1);
 
                 <div class="main-header__side-item user-menu">
                     <div class="user-menu__data">
-                        <p>Константин</p>
+                        <p>Сергей</p>
 
                         <a href="#">Выйти</a>
                     </div>
