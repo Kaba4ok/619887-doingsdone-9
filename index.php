@@ -44,6 +44,17 @@ $tasks = [
     ]
 ];
 ?>
+<?php
+    function getTaskCount ($taskArray, $project) {
+        $count = 0;
+        foreach ($taskArray as $key => $value) {
+            if ((string)$value["category"] === $project) {
+                $count++;
+            };
+        };
+        return $count;
+    };
+?>
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -89,7 +100,7 @@ $tasks = [
                             <a class="main-navigation__list-item-link" href="#">
                                 <?=$value ?>
                             </a>
-                            <span class="main-navigation__list-item-count">0</span>
+                            <span class="main-navigation__list-item-count"><?=getTaskCount($tasks, (string)$value); ?></span>
                         </li>
                         <?php endforeach ?>
                     </ul>
