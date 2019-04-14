@@ -2,6 +2,48 @@
 // показывать или нет выполненные задачи
 $show_complete_tasks = rand(0, 1);
 ?>
+
+<?php
+$projects = ["Входящие", "Учеба", "Работа", "Домашние дела", "Авто"];
+$tasks = [
+    [
+        "task" => "Собеседование в IT компании",
+        "deadline" => "01.12.2018",
+        "category" => "Работа",
+        "status" => false
+    ],
+    [
+        "task" => "Выполнить тестовое задание",
+        "deadline" => "25.12.2018",
+        "category" => "Работа",
+        "status" => false
+    ],
+    [
+        "task" => "Сделать задание первого раздела",
+        "deadline" => "21.12.2018",
+        "category" => "Учеба",
+        "status" => true
+    ],
+    [
+        "task" => "Встреча с другом",
+        "deadline" => "22.12.2018",
+        "category" => "Входящие",
+        "status" => false
+    ],
+    [
+        "task" => "Купить корм для кота",
+        "deadline" => "Нет",
+        "category" => "Домашние дела",
+        "status" => false
+    ],
+    [
+        "task" => "Заказать пиццу",
+        "deadline" => "Нет",
+        "category" => "Домашние дела",
+        "status" => false
+    ]
+];
+?>
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -42,10 +84,14 @@ $show_complete_tasks = rand(0, 1);
 
                 <nav class="main-navigation">
                     <ul class="main-navigation__list">
+                        <?php foreach ($projects as $value): ?>
                         <li class="main-navigation__list-item">
-                            <a class="main-navigation__list-item-link" href="#">Название проекта</a>
+                            <a class="main-navigation__list-item-link" href="#">
+                                <?=$value ?>
+                            </a>
                             <span class="main-navigation__list-item-count">0</span>
                         </li>
+                        <?php endforeach ?>
                     </ul>
                 </nav>
 
@@ -79,20 +125,24 @@ $show_complete_tasks = rand(0, 1);
                 </div>
 
                 <table class="tasks">
-                    <tr class="tasks__item task">
-                        <td class="task__select">
-                            <label class="checkbox task__checkbox">
-                                <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1">
-                                <span class="checkbox__text">Сделать главную страницу Дела в порядке</span>
-                            </label>
-                        </td>
+                    <?php foreach ($tasks as $key => $value): ?>
+                        <?php if(!($value["status"]) || ($value["status"] && (int) $show_complete_tasks === 1)): ?>
+                            <tr class="tasks__item task <?php if($value["status"]): ?> task--completed <?php endif ?>">
+                                <td class="task__select">
+                                    <label class="checkbox task__checkbox">
+                                        <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1">
+                                        <span class="checkbox__text"><?=$value["task"]; ?></span>
+                                    </label>
+                                </td>
 
-                        <td class="task__file">
-                            <a class="download-link" href="#">Home.psd</a>
-                        </td>
+                                <td class="task__file">
+                                    <a class="download-link" href="#">Home.psd</a>
+                                </td>
 
-                        <td class="task__date"></td>
-                    </tr>
+                                <td class="task__date"><?=$value["deadline"]; ?></td>
+                            </tr>
+                        <?php endif ?>
+                    <?php endforeach ?>
                     <?php if((int) $show_complete_tasks === 1): ?>
                     <tr class="tasks__item task task--completed">
                         <td class="task__select">
