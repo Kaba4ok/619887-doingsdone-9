@@ -32,13 +32,13 @@ $tasks = [
     ],
     [
         "task" => "Купить корм для кота",
-        "deadline" => "Нет",
+        "deadline" => null,
         "category" => "Домашние дела",
         "status" => false
     ],
     [
         "task" => "Заказать пиццу",
-        "deadline" => "Нет",
+        "deadline" => null,
         "category" => "Домашние дела",
         "status" => false
     ]
@@ -130,13 +130,13 @@ $tasks = [
                             <tr class="tasks__item task <?php if($value["status"]): ?> task--completed <?php endif ?>">
                                 <td class="task__select">
                                     <label class="checkbox task__checkbox">
-                                        <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1">
+                                        <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?php if($value["status"]): ?> checked <?php endif ?>>
                                         <span class="checkbox__text"><?=$value["task"]; ?></span>
                                     </label>
                                 </td>
 
                                 <td class="task__file">
-                                    <a class="download-link" href="#">Home.psd</a>
+                                    <!-- <a class="download-link" href="#">Home.psd</a> -->
                                 </td>
 
                                 <td class="task__date"><?=$value["deadline"]; ?></td>
