@@ -10,37 +10,37 @@ $tasks = [
         "task" => "Собеседование в IT компании",
         "deadline" => "01.12.2018",
         "category" => "Работа",
-        "status" => "Нет"
+        "status" => false
     ],
     [
         "task" => "Выполнить тестовое задание",
         "deadline" => "25.12.2018",
         "category" => "Работа",
-        "status" => "Нет"
+        "status" => false
     ],
     [
         "task" => "Сделать задание первого раздела",
         "deadline" => "21.12.2018",
         "category" => "Учеба",
-        "status" => "Да"
+        "status" => true
     ],
     [
         "task" => "Встреча с другом",
         "deadline" => "22.12.2018",
         "category" => "Входящие",
-        "status" => "Нет"
+        "status" => false
     ],
     [
         "task" => "Купить корм для кота",
         "deadline" => "Нет",
         "category" => "Домашние дела",
-        "status" => "Нет"
+        "status" => false
     ],
     [
         "task" => "Заказать пиццу",
         "deadline" => "Нет",
         "category" => "Домашние дела",
-        "status" => "Нет"
+        "status" => false
     ]
 ];
 ?>
@@ -126,8 +126,8 @@ $tasks = [
 
                 <table class="tasks">
                     <?php foreach ($tasks as $key => $value): ?>
-                        <?php if((string)$value["status"] === "Нет" || ((string)$value["status"] === "Да" && (int) $show_complete_tasks === 1)): ?>
-                            <tr class="tasks__item task <?php if((string)$value["status"] === "Да"): ?> task--completed <?php endif ?>">
+                        <?php if(!($value["status"]) || ($value["status"] && (int) $show_complete_tasks === 1)): ?>
+                            <tr class="tasks__item task <?php if($value["status"]): ?> task--completed <?php endif ?>">
                                 <td class="task__select">
                                     <label class="checkbox task__checkbox">
                                         <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1">
