@@ -32,17 +32,28 @@ $tasks = [
     ],
     [
         "task" => "Купить корм для кота",
-        "deadline" => "Нет",
+        "deadline" => null,
         "category" => "Домашние дела",
         "status" => false
     ],
     [
         "task" => "Заказать пиццу",
-        "deadline" => "Нет",
+        "deadline" => null,
         "category" => "Домашние дела",
         "status" => false
     ]
 ];
+?>
+<?php
+    function getTaskCount ($taskArray, $project) {
+        $count = 0;
+        foreach ($taskArray as $key => $value) {
+            if ((string)$value["category"] === $project) {
+                $count++;
+            };
+        };
+        return $count;
+    };
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -89,7 +100,7 @@ $tasks = [
                             <a class="main-navigation__list-item-link" href="#">
                                 <?=$value ?>
                             </a>
-                            <span class="main-navigation__list-item-count">0</span>
+                            <span class="main-navigation__list-item-count"><?=getTaskCount($tasks, (string)$value); ?></span>
                         </li>
                         <?php endforeach ?>
                     </ul>
@@ -130,13 +141,13 @@ $tasks = [
                             <tr class="tasks__item task <?php if($value["status"]): ?> task--completed <?php endif ?>">
                                 <td class="task__select">
                                     <label class="checkbox task__checkbox">
-                                        <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1">
+                                        <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?php if($value["status"]): ?> checked <?php endif ?>>
                                         <span class="checkbox__text"><?=$value["task"]; ?></span>
                                     </label>
                                 </td>
 
                                 <td class="task__file">
-                                    <a class="download-link" href="#">Home.psd</a>
+                                    <!-- <a class="download-link" href="#">Home.psd</a> -->
                                 </td>
 
                                 <td class="task__date"><?=$value["deadline"]; ?></td>
