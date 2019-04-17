@@ -1,4 +1,10 @@
 <?php
+    /**
+     * Считает количество задач в проекте/категории
+     * @param array $taskArray Ассоциативный массив с задачами
+     * @param string $project Строка с именем проекта/категории
+     * @return integer Количество задач в проекте/категории
+     */
     function getTaskCount ($taskArray, $project) {
         $count = 0;
         foreach ($taskArray as $key => $value) {
