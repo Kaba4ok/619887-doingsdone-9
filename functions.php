@@ -2,10 +2,10 @@
     function getTaskCount ($taskArray, $project) {
         $count = 0;
         foreach ($taskArray as $key => $value) {
-            if ((string)$value["category"] === $project) {
+            if ($value["category"] === $project) {
                 $count++;
-            };
-        };
+            }
+        }
         return $count;
     };
 
