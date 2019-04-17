@@ -25,7 +25,15 @@
 <table class="tasks">
     <?php foreach ($tasks as $key => $value): ?>
         <?php if(!($value["status"]) || ($value["status"] && (int) $show_complete_tasks === 1)): ?>
-            <tr class="tasks__item task <?php if($value["status"]): ?> task--completed <?php endif ?>">
+            <?php if((bool)($value["deadline"])): ?>
+                <?php
+                    $secInHour = 3600;
+                    $curTime = strtotime("now");
+                    $deadLine = strtotime($value["deadline"]);
+                    $hoursCount = ($deadLine - $curTime) / $secInHour;
+                ?>
+            <?php endif ?>
+            <tr class="tasks__item task <?php if ((int)$hoursCount <= 24 && $value["deadline"] !== null): ?> task--important <?php endif ?> <?php if($value["status"]): ?> task--completed <?php endif ?>">
                 <td class="task__select">
                     <label class="checkbox task__checkbox">
                         <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?php if($value["status"]): ?> checked <?php endif ?>>
