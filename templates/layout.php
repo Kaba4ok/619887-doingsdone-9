@@ -43,7 +43,7 @@
                             <a class="main-navigation__list-item-link" href="#">
                                 <?=htmlspecialchars($value); ?>
                             </a>
-                            <span class="main-navigation__list-item-count"><?=getTaskCount($tasks, $value); ?></span>
+                            <span class="main-navigation__list-item-count"><?=get_task_count($tasks, $value); ?></span>
                         </li>
                         <?php endforeach ?>
                     </ul>
