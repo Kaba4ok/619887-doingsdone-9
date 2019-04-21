@@ -6,7 +6,8 @@ USE dvp;
 
 CREATE TABLE projects(
   id_project INT AUTO_INCREMENT PRIMARY KEY,
-  project CHAR(64) NOT NULL UNIQUE
+  project CHAR(64) NOT NULL UNIQUE,
+  id_user INT
 );
 
 CREATE TABLE tasks(
@@ -15,7 +16,9 @@ CREATE TABLE tasks(
   status INT(64) DEFAULT 0,
   task CHAR(128) NOT NULL UNIQUE,
   file CHAR(128) UNIQUE,
-  deadline TIMESTAMP
+  deadline TIMESTAMP,
+  id_user INT,
+  id_project INT
 );
 
 CREATE TABLE users(
@@ -26,7 +29,10 @@ CREATE TABLE users(
   password CHAR(64) NOT NULL
 );
 
-CREATE INDEX t_dt_create ON tasks(dt_create);
-CREATE INDEX t_status ON tasks(status);
-CREATE INDEX t_deadline ON tasks(deadline);
-CREATE INDEX u_dt_reg ON users(dt_reg);
+CREATE INDEX dt_create ON tasks(dt_create);
+CREATE INDEX status ON tasks(status);
+CREATE INDEX deadline ON tasks(deadline);
+CREATE INDEX dt_reg ON users(dt_reg);
+CREATE INDEX id_user ON projects(id_user);
+CREATE INDEX id_user ON tasks(id_user);
+CREATE INDEX id_project ON tasks(id_project);
