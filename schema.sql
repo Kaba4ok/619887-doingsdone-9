@@ -26,10 +26,6 @@ CREATE TABLE users(
   password CHAR(64) NOT NULL
 );
 
-CREATE UNIQUE INDEX t_task ON tasks(task);
-CREATE UNIQUE INDEX t_file ON tasks(file);
-CREATE UNIQUE INDEX u_email ON users(email);
-CREATE UNIQUE INDEX u_name ON users(name);
 CREATE INDEX t_dt_create ON tasks(dt_create);
 CREATE INDEX t_status ON tasks(status);
 CREATE INDEX t_deadline ON tasks(deadline);
