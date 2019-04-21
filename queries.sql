@@ -26,6 +26,12 @@ JOIN users u
 ON p.id_user = u.id_user
 WHERE p.id_user = 2;
 
+/*посчитать количество задач в каждом проекте*/
+SELECT COUNT(*) task, project FROM tasks t
+JOIN projects p
+ON p.id_project = t.id_project
+WHERE p.id_project = 3;
+
 /*получить список из всех задач для одного проекта*/
 SELECT project, task FROM projects p
 JOIN tasks t
