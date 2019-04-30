@@ -4,7 +4,7 @@
      * @param string $value Дата окончания срока выполнения задачи
      * @return float Количество часов до окончания срока выполнения задачи
      */
-    function check_time ($value) {
+    function check_time($value) {
         if ($value) {
             $sec_in_hour = 3600;
             $cur_time = strtotime("now");
@@ -14,23 +14,6 @@
             return $hours_count;
         }
     }
-
-    /**
-     * Считает количество задач в проекте/категории
-     * @param array $taskArray Ассоциативный массив с задачами
-     * @param string $project Строка с именем проекта/категории
-     * @return integer Количество задач в проекте/категории
-     */
-    function get_task_count ($task_array, $project) {
-        $count = 0;
-        foreach ($task_array as $key => $value) {
-            if ($value["project"] === $project) {
-                $count++;
-            }
-        }
-        return $count;
-    };
-
 
     /**
      * Подключает шаблон, передает туда данные и возвращает итоговый HTML контент
@@ -54,4 +37,94 @@
 
         return $result;
     }
+
+    /**
+     * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
+     *
+     * @param $link mysqli Ресурс соединения
+     * @param $sql string SQL запрос с плейсхолдерами вместо значений
+     * @param array $data Данные для вставки на место плейсхолдеров
+     *
+     * @return mysqli_stmt Подготовленное выражение
+     */
+    function db_get_prepare_stmt($link, $sql, $data = []) {
+        $stmt = mysqli_prepare($link, $sql);
+
+        if ($stmt === false) {
+            $errorMsg = 'Не удалось инициализировать подготовленное выражение: ' . mysqli_error($link);
+            die($errorMsg);
+        }
+
+        if ($data) {
+            $types = '';
+            $stmt_data = [];
+
+            foreach ($data as $value) {
+                $type = 's';
+
+                if (is_int($value)) {
+                    $type = 'i';
+                }
+                else if (is_string($value)) {
+                    $type = 's';
+                }
+                else if (is_double($value)) {
+                    $type = 'd';
+                }
+
+                if ($type) {
+                    $types .= $type;
+                    $stmt_data[] = $value;
+                }
+            }
+
+            $values = array_merge([$stmt, $types], $stmt_data);
+
+            $func = 'mysqli_stmt_bind_param';
+            $func(...$values);
+
+            if (mysqli_errno($link) > 0) {
+                $errorMsg = 'Не удалось связать подготовленное выражение с параметрами: ' . mysqli_error($link);
+                die($errorMsg);
+            }
+        }
+
+        return $stmt;
+    }
+
+    /**
+     * Создает массив с данными на основе готового SQL запроса и переданных данных
+     *
+     * @param $link mysqli Ресурс соединения
+     * @param $sql string SQL запрос с плейсхолдерами вместо значений
+     * @param array $data Данные для вставки на место плейсхолдеров
+     *
+     * @return $result Массив с данными
+     */
+    function db_fetch_data($link, $sql, $data = []) {
+        $result = [];
+        $stmt = db_get_prepare_stmt($link, $sql, $data);
+        mysqli_stmt_execute($stmt);
+        $res = mysqli_stmt_get_result($stmt);
+
+        if ($res) {
+            $result = mysqli_fetch_all($res, MYSQLI_ASSOC);
+        }
+
+        return $result;
+    }
+
+
+
+
+    /*function db_insert_data($link, $sql, $data = []) {
+        $stmt = db_get_prepare_stmt($link, $sql, $data);
+        $result = mysqli_stmt_execute($stmt);
+
+        if ($result) {
+            $result = mysqli_insert_id($link);
+        }
+
+        return $result;
+    }*/
 ?>
