@@ -39,11 +39,13 @@
                 <nav class="main-navigation">
                     <ul class="main-navigation__list">
                         <?php foreach ($projects as $value): ?>
-                        <li class="main-navigation__list-item">
-                            <a class="main-navigation__list-item-link" href="#">
+                        <li class="main-navigation__list-item <?php
+                            if(isset($_GET['id_project']) && $_GET['id_project'] == $value['id_project']): ?>
+                                main-navigation__list-item--active <?php endif ?>">
+                            <a class="main-navigation__list-item-link" href="<?= $url . $value['id_project'] ?>">
                                 <?=htmlspecialchars($value["project"]); ?>
                             </a>
-                            <span class="main-navigation__list-item-count"><?=get_task_count($tasks, $value["project"]); ?></span>
+                            <span class="main-navigation__list-item-count"><?=$value["tasks_count"]; ?></span>
                         </li>
                         <?php endforeach ?>
                     </ul>

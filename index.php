@@ -2,50 +2,9 @@
 // показывать или нет выполненные задачи
 $show_complete_tasks = rand(0, 1);
 
+$title = "Дела в порядке";
 
-// $projects = ["Входящие", "Учеба", "Работа", "Домашние дела", "Авто"];
-
-/*$tasks = [
-    [
-        "task" => "Собеседование в IT компании",
-        "deadline" => "10.06.2019",
-        "category" => "Работа",
-        "status" => false
-    ],
-    [
-        "task" => "Выполнить тестовое задание",
-        "deadline" => "25.12.2018",
-        "category" => "Работа",
-        "status" => false
-    ],
-    [
-        "task" => "Сделать задание первого раздела",
-        "deadline" => "21.12.2018",
-        "category" => "Учеба",
-        "status" => true
-    ],
-    [
-        "task" => "Встреча с другом",
-        "deadline" => "22.12.2018",
-        "category" => "Входящие",
-        "status" => false
-    ],
-    [
-        "task" => "Купить корм для кота",
-        "deadline" => null,
-        "category" => "Домашние дела",
-        "status" => false
-    ],
-    [
-        "task" => "Заказать пиццу",
-        "deadline" => null,
-        "category" => "Домашние дела",
-        "status" => false
-    ]
-];*/
-
-
-
+require_once("functions.php");
 
 //подключение к БД
 $connect = mysqli_connect("localhost", "root", "", "dvp");
@@ -59,11 +18,14 @@ if (!$connect) {
     echo($error_connect);
 } else {
     //запрос на показ списка проектов для юзера с id = 1
-    $sql_projects = "SELECT p.project "
+    $sql_projects = "SELECT project, p.id_project, COUNT(*) AS tasks_count "
         ."FROM projects AS p "
+        ."JOIN tasks AS t "
+        ."ON t.id_project = p.id_project "
         ."JOIN users AS u "
-        ."ON p.id_user = u.id_user "
-        ."WHERE p.id_user = 1";
+        ."ON u.id_user = p.id_user "
+        ."WHERE p.id_user = 1 "
+        ."GROUP BY project";
 
     //запрос на показ списка задач для юзера с id = 1
     $sql_tasks = "SELECT t.task, t.deadline, p.project, t.status "
@@ -97,16 +59,46 @@ if (!$connect) {
     }
 }
 
+//получаем ссылку на проект
+$params = $_GET;
+$params["id_project"] = "";
+$scriptname = pathinfo(__FILE__, PATHINFO_BASENAME);
+$query = http_build_query($params);
+$url = "/" . $scriptname . "?" . $query;
 
 
 
-$title = "Дела в порядке";
+if (isset($_GET["id_project"])) {
 
-require_once("functions.php");
+    if ($_GET["id_project"] == "") {
+        http_response_code(404);
+        header("Location: pages/404.html");
+        exit();
+    }
+
+    $id_project = $_GET["id_project"];
+    $id_user = 1;
+
+    $sql_id_project = "SELECT t.task, t.deadline, t.status, p.project "
+        ."FROM tasks AS t "
+        ."JOIN projects AS p "
+        ."ON t.id_project = p.id_project "
+        ."WHERE t.id_project = ? "
+        ."AND t.id_user = ?";
+
+    $tasks = db_fetch_data($connect, $sql_id_project, [$id_project, $id_user]);
+
+    if (empty($tasks)) {
+        http_response_code(404);
+        header("Location: pages/404.html");
+        exit();
+    }
+}
+
 
 $content = include_template("index.php", ["show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks]);
 
-$page = include_template("layout.php", ["content" => $content, "show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks, "title" => $title]);
+$page = include_template("layout.php", ["content" => $content, "show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks, "title" => $title, "url" => $url]);
 
 print($page);
 
