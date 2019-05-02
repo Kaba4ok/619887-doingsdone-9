@@ -62,9 +62,9 @@ if (!$connect) {
 //получаем ссылку на проект
 $params = $_GET;
 $params["id_project"] = "";
-$scriptname = pathinfo(__FILE__, PATHINFO_BASENAME);
+/*$scriptname = pathinfo(__FILE__, PATHINFO_BASENAME);
 $query = http_build_query($params);
-$url = "/" . $scriptname . "?" . $query;
+$url = "/" . $scriptname . "?" . $query;*/
 
 
 
@@ -98,7 +98,7 @@ if (isset($_GET["id_project"])) {
 
 $content = include_template("index.php", ["show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks]);
 
-$page = include_template("layout.php", ["content" => $content, "show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks, "title" => $title, "url" => $url]);
+$page = include_template("layout.php", ["content" => $content, "show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks, "title" => $title]);
 
 print($page);
 

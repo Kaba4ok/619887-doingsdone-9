@@ -16,7 +16,7 @@ CREATE TABLE tasks(
   status INT(64) DEFAULT 0,
   task CHAR(128) NOT NULL UNIQUE,
   file CHAR(128) UNIQUE,
-  deadline TIMESTAMP,
+  deadline DATE,
   id_user INT,
   id_project INT
 );
