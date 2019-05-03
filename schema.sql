@@ -14,9 +14,9 @@ CREATE TABLE tasks(
   id_task INT AUTO_INCREMENT PRIMARY KEY,
   dt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   status INT(64) DEFAULT 0,
-  task CHAR(128) NOT NULL UNIQUE,
-  file CHAR(128) UNIQUE,
-  deadline TIMESTAMP,
+  task CHAR(128) NOT NULL,
+  file CHAR(128),
+  deadline DATE,
   id_user INT,
   id_project INT
 );

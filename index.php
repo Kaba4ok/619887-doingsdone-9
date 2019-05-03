@@ -28,7 +28,7 @@ if (!$connect) {
         ."GROUP BY project";
 
     //запрос на показ списка задач для юзера с id = 1
-    $sql_tasks = "SELECT t.task, t.deadline, p.project, t.status "
+    $sql_tasks = "SELECT t.task, t.file, t.deadline, p.project, t.status "
         ."FROM tasks AS t "
         ."JOIN users AS u "
         ."ON u.id_user = t.id_user "
@@ -62,15 +62,15 @@ if (!$connect) {
 //получаем ссылку на проект
 $params = $_GET;
 $params["id_project"] = "";
-$scriptname = pathinfo(__FILE__, PATHINFO_BASENAME);
+/*$scriptname = pathinfo(__FILE__, PATHINFO_BASENAME);
 $query = http_build_query($params);
-$url = "/" . $scriptname . "?" . $query;
+$url = "/" . $scriptname . "?" . $query;*/
 
 
 
 if (isset($_GET["id_project"])) {
 
-    if ($_GET["id_project"] == "") {
+    if ($_GET["id_project"] === "") {
         http_response_code(404);
         header("Location: pages/404.html");
         exit();
@@ -98,7 +98,7 @@ if (isset($_GET["id_project"])) {
 
 $content = include_template("index.php", ["show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks]);
 
-$page = include_template("layout.php", ["content" => $content, "show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks, "title" => $title, "url" => $url]);
+$page = include_template("layout.php", ["content" => $content, "show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks, "title" => $title]);
 
 print($page);
 
