@@ -28,7 +28,7 @@ if (!$connect) {
         ."GROUP BY project";
 
     //запрос на показ списка задач для юзера с id = 1
-    $sql_tasks = "SELECT t.task, t.deadline, p.project, t.status "
+    $sql_tasks = "SELECT t.task, t.file, t.deadline, p.project, t.status "
         ."FROM tasks AS t "
         ."JOIN users AS u "
         ."ON u.id_user = t.id_user "
@@ -70,7 +70,7 @@ $url = "/" . $scriptname . "?" . $query;*/
 
 if (isset($_GET["id_project"])) {
 
-    if ($_GET["id_project"] == "") {
+    if ($_GET["id_project"] === "") {
         http_response_code(404);
         header("Location: pages/404.html");
         exit();

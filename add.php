@@ -38,8 +38,7 @@
 
     $content = include_template("add.php", ["projects" => $projects]);
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $required = ["name", "project"];
 
@@ -64,13 +63,15 @@
             if (!is_date_valid($deadline_time)) {
                 $errors["date"] = "Неправильный формат даты";
             }
+        } else {
+            $_POST["date"] = null;
         }
 
         //проверка на соответствие проекта
         $err_proj = true;
 
         foreach ($projects as $key => $value) {
-            if ($value["id_project"] == $_POST["project"]) {
+            if ($value["id_project"] === $_POST["project"]) {
                 $err_proj = false;
             }
         }
@@ -80,12 +81,15 @@
         }
 
         //загрузка файла
+        $file = null;
         if (isset($_FILES["file"])) {
             $file_name = $_FILES["file"]["name"];
             $file_path = __DIR__ . "/uploads/";
             $file_url = "/uploads/" . $file_name;
 
             move_uploaded_file($_FILES["file"]["tmp_name"], $file_path . $file_name);
+
+            $file = $file_url;
         }
 
         //проверка на наличие ошибок
@@ -95,7 +99,6 @@
             //формирование запроса с данными из формы и редирект на главную страницу в случае отсутствия ошибок
             $status = 0;
             $task_name = $_POST["name"];
-            $file = $file_url;
             $deadline = $_POST["date"];
             $id_user = 1;
             $id_project = $_POST["project"];

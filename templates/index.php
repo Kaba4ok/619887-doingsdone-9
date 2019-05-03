@@ -33,9 +33,11 @@
                     </label>
                 </td>
 
-                <td class="task__file">
-                    <!-- <a class="download-link" href="#">Home.psd</a> -->
-                </td>
+                    <td class="task__file">
+                        <?php if(isset($value["file"])): ?>
+                        <a class="download-link" href="<?= $value['file'] ?>" download><?= get_file_name($value["file"]); ?></a>
+                        <?php endif ?>
+                    </td>
 
                 <td class="task__date"><?=$value["deadline"]; ?></td>
             </tr>
