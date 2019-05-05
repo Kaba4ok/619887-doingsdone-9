@@ -159,12 +159,17 @@
      * Получает имя файла на основе пути к этому файлу
      *
      * @param $path string Путь к файлу
-     * @return $result string Имя файла
+     * @return $name string Имя файла
      */
     function get_file_name($path) {
-        $separate_path = explode("/", $path);
+        $separate_path = explode("___", $path);
         $result = array_pop($separate_path);
+        $name = mb_substr($result, 0, 25);
 
-        return $result;
+        if (mb_strlen($name) >= 25) {
+            $name = $name . "...";
+        }
+
+        return $name;
     }
 ?>
