@@ -56,7 +56,7 @@
             </section>
 
             <main class="content__main">
-                <?=$content ?>
+                <?= $content ?>
             </main>
         </div>
     </div>

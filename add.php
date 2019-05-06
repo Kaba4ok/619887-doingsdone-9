@@ -82,8 +82,9 @@
 
         //загрузка файла
         $file = null;
+
         if (isset($_FILES["file"])) {
-            $file_name = $_FILES["file"]["name"];
+            $file_name = date("Y-m-d-H-i-s") . "___" . $_FILES["file"]["name"];
             $file_path = __DIR__ . "/uploads/";
             $file_url = "/uploads/" . $file_name;
 
@@ -96,7 +97,7 @@
         if (count($errors)) {
             $content = include_template("add.php", ["projects" => $projects, "errors" => $errors]);
         } else {
-            //формирование запроса с данными из формы и редирект на главную страницу в случае отсутствия ошибок
+            //формирование запроса на добавление данных из формы в БД и редирект на главную страницу в случае отсутствия ошибок
             $status = 0;
             $task_name = $_POST["name"];
             $deadline = $_POST["date"];
