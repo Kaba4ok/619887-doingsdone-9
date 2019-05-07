@@ -15,7 +15,7 @@ CREATE TABLE tasks(
   dt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   status INT(64) DEFAULT 0,
   task CHAR(128) NOT NULL,
-  file CHAR(128),
+  file CHAR(128) DEFAULT NULL,
   deadline DATE,
   id_user INT,
   id_project INT

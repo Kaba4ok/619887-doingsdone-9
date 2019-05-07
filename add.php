@@ -1,5 +1,7 @@
 <?php
 
+    session_start();
+
     $title = "Дела в порядке";
 
     require_once("functions.php");
@@ -83,7 +85,7 @@
         //загрузка файла
         $file = null;
 
-        if (isset($_FILES["file"])) {
+        if (isset($_FILES["file"]) && !empty($_FILES["file"]["name"])) {
             $file_name = date("Y-m-d-H-i-s") . "___" . $_FILES["file"]["name"];
             $file_path = __DIR__ . "/uploads/";
             $file_url = "/uploads/" . $file_name;
@@ -91,6 +93,7 @@
             move_uploaded_file($_FILES["file"]["tmp_name"], $file_path . $file_name);
 
             $file = $file_url;
+
         }
 
         //проверка на наличие ошибок

@@ -23,8 +23,8 @@ VALUES
 
 INSERT INTO users (email, name, password)
 VALUES
-  ("pupkin@mail.ru", "Вася", "1234"),
-  ("ivanov@mail.ru", "Петя", "4321");
+  ("pupkin@mail.ru", "Вася", "$2y$10$6fK0Odwa5WbakwqQTgkxQuE4A5saAmr5TH3SerSNgpIuGiIC84mna"),
+  ("ivanov@mail.ru", "Петя", "$2y$10$3ifE56LFtOFjNiHUKxxh2.1BE9ngCPxvvhco6SqLfRGQdYZhDETi.");
 
 /*получить список из всех проектов для одного пользователя*/
 SELECT name, project FROM projects p
