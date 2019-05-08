@@ -79,10 +79,10 @@ if (isset($_SESSION) && !empty($_SESSION)) {
     $content = include_template("index.php", ["show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks]);
 
     $page = include_template("layout.php", ["content" => $content, "show_complete_tasks" => $show_complete_tasks, "projects" => $projects, "tasks" => $tasks, "title" => $title, "db_user_name" => $db_user_name]);
-} else {
-    $page = include_template("guest.php", ["title" => $title]);
-}
 
-print($page);
+    print($page);
+} else {
+    header("Location: guest.php");
+}
 
 ?>
