@@ -22,21 +22,19 @@
         } else {
 
         //запрос на показ списка проектов
-            $sql_projects = "SELECT project, p.id_project, COUNT(*) AS tasks_count "
+            $sql_projects = "SELECT p.*, COUNT(t.id_task) AS tasks_count "
             ."FROM projects AS p "
-            ."JOIN tasks AS t "
-            ."ON t.id_project = p.id_project "
+            ."LEFT JOIN tasks AS t "
+            ."ON p.id_project = t.id_project "
             ."WHERE p.id_user = ? "
             ."GROUP BY project";
 
         //запрос на показ списка задач
             $sql_tasks = "SELECT t.task, t.file, t.deadline, p.project, t.status "
             ."FROM tasks AS t "
-            ."JOIN users AS u "
-            ."ON u.id_user = t.id_user "
             ."JOIN projects AS p "
             ."ON p.id_project = t.id_project "
-            ."WHERE u.id_user = ?";
+            ."WHERE t.id_user = ?";
 
             foreach ($_SESSION["user"] as $key => $value) {
                 $db_id_user = $value["id_user"];

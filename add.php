@@ -18,11 +18,11 @@
             $error_connect = mysqli_connect_error(); //если подключение не удалось, показать текст ошибки
             echo($error_connect);
         } else {
-            //запрос на показ списка проектов для юзера с id = 1
-            $sql_projects = "SELECT p.*, COUNT(*) AS tasks_count "
+            //запрос на показ списка проектов
+            $sql_projects = "SELECT p.*, COUNT(t.id_task) AS tasks_count "
                 ."FROM projects AS p "
-                ."JOIN tasks AS t "
-                ."ON t.id_project = p.id_project "
+                ."LEFT JOIN tasks AS t "
+                ."ON p.id_project = t.id_project "
                 ."WHERE p.id_user = ? "
                 ."GROUP BY project";
 
@@ -69,7 +69,7 @@
             $err_proj = true;
 
             foreach ($projects as $key => $value) {
-                if ($value["id_project"] === $_POST["project"]) {
+                if ($value["id_project"] === (int)$_POST["project"]) {
                     $err_proj = false;
                 }
             }
@@ -100,14 +100,13 @@
                 $status = 0;
                 $task_name = $_POST["name"];
                 $deadline = $_POST["date"];
-                $id_user = $db_id_user;
                 $id_project = $_POST["project"];
 
                 $sql_task = "INSERT INTO tasks (status, task, file, deadline, id_user, id_project) "
                 ."VALUES "
                 ."(?, ?, ?, ?, ?, ?)";
 
-                db_insert_data($connect, $sql_task, [$status, $task_name, $file, $deadline, $id_user, $id_project]);
+                db_insert_data($connect, $sql_task, [$status, $task_name, $file, $deadline, $db_id_user, $id_project]);
 
                 header("Location: /index.php");
             }

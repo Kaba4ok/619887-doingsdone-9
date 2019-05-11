@@ -19,10 +19,10 @@
             echo($error_connect);
         } else {
             //запрос на показ списка проектов
-            $sql_projects = "SELECT p.*, COUNT(*) AS tasks_count "
+            $sql_projects = "SELECT p.*, COUNT(t.id_task) AS tasks_count "
                 ."FROM projects AS p "
-                ."JOIN tasks AS t "
-                ."ON t.id_project = p.id_project "
+                ."LEFT JOIN tasks AS t "
+                ."ON p.id_project = t.id_project "
                 ."WHERE p.id_user = ? "
                 ."GROUP BY project";
 
@@ -44,6 +44,12 @@
             // проверка на заполненность обязательных полей
             if (empty($_POST["name"])) {
                 $errors["name"] = "Это поле надо заполнить";
+            }
+
+            foreach ($projects as $key => $value) {
+                if ($value["project"] === $_POST["name"]) {
+                    $errors["name"] = "Такой проект уже существует";
+                }
             }
 
             //проверка на наличие ошибок
