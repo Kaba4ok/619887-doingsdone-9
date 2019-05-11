@@ -28,7 +28,7 @@
             <tr class="tasks__item task <?php if ((int)check_time($value["deadline"]) <= 24 && $value["deadline"] !== null && !($value["status"])): ?> task--important <?php endif ?> <?php if($value["status"]): ?> task--completed <?php endif ?>">
                 <td class="task__select">
                     <label class="checkbox task__checkbox">
-                        <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="1" <?php if($value["status"]): ?> checked <?php endif ?>>
+                        <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="<?= $value['id_task'] ?>" <?php if($value["status"]): ?> checked <?php endif ?>>
                         <span class="checkbox__text"><?=htmlspecialchars($value["task"]); ?></span>
                     </label>
                 </td>
@@ -43,17 +43,4 @@
             </tr>
         <?php endif ?>
     <?php endforeach ?>
-    <!-- <?php if((int) $show_complete_tasks === 1): ?>
-    <tr class="tasks__item task task--completed">
-        <td class="task__select">
-            <label class="checkbox task__checkbox">
-                <input class="checkbox__input visually-hidden" type="checkbox" checked>
-                <span class="checkbox__text">Записаться на интенсив "Базовый PHP"</span>
-            </label>
-        </td>
-        <td class="task__date">10.10.2019</td>
-        <td class="task__controls"></td>
-    </tr>
-    <?php endif ?> -->
-    <!--показывать следующий тег <tr/>, если переменная $show_complete_tasks равна единице-->
 </table>

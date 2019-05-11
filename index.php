@@ -1,7 +1,7 @@
 <?php
     session_start();
     // показывать или нет выполненные задачи
-    $show_complete_tasks = rand(0, 1);
+    $show_complete_tasks = 1; //rand(0, 1)
 
     $title = "Дела в порядке";
 
@@ -30,7 +30,7 @@
             ."GROUP BY project";
 
         //запрос на показ списка задач
-            $sql_tasks = "SELECT t.task, t.file, t.deadline, p.project, t.status "
+            $sql_tasks = "SELECT t.id_task, t.task, t.file, t.deadline, p.project, t.status "
             ."FROM tasks AS t "
             ."JOIN projects AS p "
             ."ON p.id_project = t.id_project "
@@ -55,7 +55,7 @@
 
             $id_project = $_GET["id_project"];
 
-            $sql_id_project = "SELECT t.task, t.file, t.deadline, t.status, p.project "
+            $sql_id_project = "SELECT t.id_task, t.task, t.file, t.deadline, t.status, p.project "
             ."FROM tasks AS t "
             ."JOIN projects AS p "
             ."ON t.id_project = p.id_project "
@@ -69,6 +69,25 @@
                 header("Location: pages/404.html");
                 exit();
             }
+        }
+
+        if (isset($_GET["task_id"]) && isset($_GET["check"])) {
+            $id_task = $_GET["task_id"];
+            $check = $_GET["check"];
+
+            $status = 0;
+
+            if ((int)$check === 1) {
+                $status = 1;
+            }
+
+            $sql_task_status = "UPDATE tasks AS t "
+                ."SET status = ? "
+                ."WHERE t.id_task = ?";
+
+            db_insert_data($connect, $sql_task_status, [$status, $id_task]);
+
+            header("Location: index.php");
         }
 
 
