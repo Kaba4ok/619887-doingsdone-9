@@ -45,14 +45,14 @@
                             <a class="main-navigation__list-item-link" href="/index.php?id_project=<?= $value['id_project'] ?>">
                                 <?=htmlspecialchars($value["project"]); ?>
                             </a>
-                            <span class="main-navigation__list-item-count"><?=$value["tasks_count"]; ?></span>
+                            <span class="main-navigation__list-item-count"><?= $value["tasks_count"]; ?></span>
                         </li>
                         <?php endforeach ?>
                     </ul>
                 </nav>
 
                 <a class="button button--transparent button--plus content__side-button"
-                   href="pages/form-project.html" target="project_add">Добавить проект</a>
+                   href="project_add.php">Добавить проект</a>
             </section>
 
             <main class="content__main">
