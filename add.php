@@ -51,10 +51,10 @@
 
             //проверка формата и значения даты
             if ($_POST["date"] !== "") {
-                $current_time = strtotime("now");
+                $current_time = date("Y-m-d");
                 $deadline_time = $_POST["date"];
 
-                if (strtotime($deadline_time) <= $current_time) {
+                if ($deadline_time < $current_time) {
                     $errors["date"] = "Дата выполнения должна быть больше или равна текущей дате";
                 }
 
