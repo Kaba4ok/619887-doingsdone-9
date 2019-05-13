@@ -100,7 +100,25 @@
 
             db_insert_data($connect, $sql_task_status, [$status, $id_task]);
 
-            header("Location: index.php");
+            header("Location: $_SERVER[HTTP_REFERER]");
+        }
+
+        //поиск
+        $error_search_message = false;
+        if (isset($_GET["search"])) {
+
+            $search_value = trim($_GET["search"]);
+
+            $sql_search_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
+                ."FROM tasks "
+                ."WHERE id_user = ? "
+                ."AND MATCH(task) AGAINST(?)";
+
+            $tasks = db_fetch_data($connect, $sql_search_tasks, [$db_id_user, $search_value]);
+
+            if (empty($tasks) && empty($search_value)) {
+                $error_search_message = true;
+            }
         }
 
         //фильтр задач
@@ -172,7 +190,7 @@
             $_GET["filter"] = "all_tasks";
         }
 
-        $content = include_template("index.php", ["show_completed_status" => $show_completed_status, "projects" => $projects, "tasks" => $tasks]);
+        $content = include_template("index.php", ["show_completed_status" => $show_completed_status, "projects" => $projects, "tasks" => $tasks, "error_search_message" => $error_search_message]);
 
         $page = include_template("layout.php", ["content" => $content, "projects" => $projects, "tasks" => $tasks, "title" => $title, "db_user_name" => $db_user_name]);
 
