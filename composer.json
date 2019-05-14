@@ -1,0 +1,15 @@
+{
+    "name": "kaba4ok/dvp",
+    "description": "Web-application to do list",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Сергей",
+            "email": "s.p.prohorov@gmail.com"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.2"
+    }
+}
