@@ -2,6 +2,9 @@
 
     session_start();
 
+    //подключаем composer
+    require_once("vendor/autoload.php");
+
     $title = "Дела в порядке";
 
     require_once("functions.php");

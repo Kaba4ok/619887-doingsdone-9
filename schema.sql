@@ -36,3 +36,4 @@ CREATE INDEX dt_reg ON users(dt_reg);
 CREATE INDEX id_user ON projects(id_user);
 CREATE INDEX id_user ON tasks(id_user);
 CREATE INDEX id_project ON tasks(id_project);
+CREATE FULLTEXT INDEX task ON tasks(task);
