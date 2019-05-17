@@ -48,3 +48,8 @@
         <?php endif ?>
     <?php endforeach ?>
 </table>
+
+<?= include_template("pagination.php",[
+    "cur_page" => $cur_page,
+    "pages_count" => $pages_count,
+    "pages" => $pages]); ?>

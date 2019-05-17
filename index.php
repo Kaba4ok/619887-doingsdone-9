@@ -12,6 +12,11 @@
 
     if (isset($_SESSION) && !empty($_SESSION)) {
 
+        foreach ($_SESSION["user"] as $key => $value) {
+            $db_id_user = $value["id_user"];
+            $db_user_name = $value["name"];
+        }
+
         //подключение к БД
         $connect = mysqli_connect("localhost", "root", "", "dvp");
 
@@ -23,6 +28,32 @@
             $error_connect = mysqli_connect_error(); //если подключение не удалось, показать текст ошибки
             echo($error_connect);
         } else {
+
+        //пагинация
+            if (isset($_GET["page"])) {
+                $cur_page = $_GET["page"];
+            } else {
+                $cur_page = 1;
+            }
+
+            $page_items = 5;
+
+            $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
+            ."FROM tasks "
+            ."WHERE id_user = ?";
+
+            $tasks_count_arr = db_fetch_data($connect, $sql_tasks_count, [$db_id_user]);
+
+            $tasks_count = 0;
+
+            foreach ($tasks_count_arr as $key => $value) {
+                $tasks_count = $value;
+            }
+
+            $pages_count = ceil($tasks_count["tasks_count"] / $page_items);
+            $offset = ($cur_page - 1) * $page_items;
+
+            $pages = range(1, $pages_count);
 
         //запрос на показ списка проектов
             $sql_projects = "SELECT p.*, COUNT(t.id_task) AS tasks_count "
@@ -37,12 +68,8 @@
             ."FROM tasks AS t "
             ."JOIN projects AS p "
             ."ON p.id_project = t.id_project "
-            ."WHERE t.id_user = ?";
-
-            foreach ($_SESSION["user"] as $key => $value) {
-                $db_id_user = $value["id_user"];
-                $db_user_name = $value["name"];
-            }
+            ."WHERE t.id_user = ? "
+            ."LIMIT " . $page_items . " OFFSET " . $offset;
 
             $projects = db_fetch_data($connect, $sql_projects, [$db_id_user]);
             $tasks = db_fetch_data($connect, $sql_tasks, [$db_id_user]);
@@ -64,7 +91,8 @@
             ."JOIN projects AS p "
             ."ON t.id_project = p.id_project "
             ."WHERE t.id_project = ? "
-            ."AND t.id_user = ?";
+            ."AND t.id_user = ? "
+            ."LIMIT " . $page_items . " OFFSET " . $offset;
 
             $tasks = db_fetch_data($connect, $sql_id_project, [$id_project, $db_id_user]);
 
@@ -118,7 +146,8 @@
                 $sql_search_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
                     ."FROM tasks "
                     ."WHERE id_user = ? "
-                    ."AND MATCH(task) AGAINST(?)";
+                    ."AND MATCH(task) AGAINST(?) "
+                    ."LIMIT " . $page_items . " OFFSET " . $offset;
 
                 $tasks = db_fetch_data($connect, $sql_search_tasks, [$db_id_user, $search_value]);
 
@@ -133,7 +162,8 @@
                 $sql_search_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
                     ."FROM tasks "
                     ."WHERE id_user = ? "
-                    ."AND task LIKE ?";
+                    ."AND task LIKE ? "
+                    ."LIMIT " . $page_items . " OFFSET " . $offset;
 
                 $tasks = db_fetch_data($connect, $sql_search_tasks, [$db_id_user, $search_value]);
 
@@ -150,7 +180,8 @@
                 $sql_filtered_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
                     ."FROM tasks "
                     ."WHERE id_user = ? "
-                    ."AND deadline = CURDATE()";
+                    ."AND deadline = CURDATE() "
+                    ."LIMIT " . $page_items . " OFFSET " . $offset;
 
                 $tasks = db_fetch_data($connect, $sql_filtered_tasks, [$db_id_user]);
 
@@ -161,7 +192,8 @@
                     ."ON t.id_project = p.id_project "
                     ."WHERE t.id_project = ? "
                     ."AND t.id_user = ? "
-                    ."AND deadline = CURDATE()";
+                    ."AND deadline = CURDATE() "
+                    ."LIMIT " . $page_items . " OFFSET " . $offset;
 
                     $tasks = db_fetch_data($connect, $sql_filtered_tasks, [$id_project, $db_id_user]);
                 }
@@ -171,7 +203,8 @@
                 $sql_filtered_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
                     ."FROM tasks "
                     ."WHERE id_user = ? "
-                    ."AND deadline = DATE_ADD(CURDATE(), Interval 1 DAY)";
+                    ."AND deadline = DATE_ADD(CURDATE(), Interval 1 DAY) "
+                    ."LIMIT " . $page_items . " OFFSET " . $offset;
 
                 $tasks = db_fetch_data($connect, $sql_filtered_tasks, [$db_id_user]);
 
@@ -182,7 +215,8 @@
                     ."ON t.id_project = p.id_project "
                     ."WHERE t.id_project = ? "
                     ."AND t.id_user = ? "
-                    ."AND deadline = DATE_ADD(CURDATE(), Interval 1 DAY)";
+                    ."AND deadline = DATE_ADD(CURDATE(), Interval 1 DAY) "
+                    ."LIMIT " . $page_items . " OFFSET " . $offset;
 
                     $tasks = db_fetch_data($connect, $sql_filtered_tasks, [$id_project, $db_id_user]);
                 }
@@ -192,7 +226,8 @@
                 $sql_filtered_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
                     ."FROM tasks "
                     ."WHERE id_user = ? "
-                    ."AND deadline < CURDATE()";
+                    ."AND deadline < CURDATE() "
+                    ."LIMIT " . $page_items . " OFFSET " . $offset;
 
                 $tasks = db_fetch_data($connect, $sql_filtered_tasks, [$db_id_user]);
 
@@ -203,7 +238,8 @@
                     ."ON t.id_project = p.id_project "
                     ."WHERE t.id_project = ? "
                     ."AND t.id_user = ? "
-                    ."AND deadline < CURDATE()";
+                    ."AND deadline < CURDATE() "
+                    ."LIMIT " . $page_items . " OFFSET " . $offset;
 
                     $tasks = db_fetch_data($connect, $sql_filtered_tasks, [$id_project, $db_id_user]);
                 }
@@ -212,9 +248,21 @@
             $_GET["filter"] = "all_tasks";
         }
 
-        $content = include_template("index.php", ["show_completed_status" => $show_completed_status, "projects" => $projects, "tasks" => $tasks, "error_search_message" => $error_search_message]);
+        $content = include_template("index.php", [
+            "show_completed_status" => $show_completed_status,
+            "projects" => $projects,
+            "tasks" => $tasks,
+            "error_search_message" => $error_search_message,
+            "cur_page" => $cur_page,
+            "pages_count" => $pages_count,
+            "pages" => $pages]);
 
-        $page = include_template("layout.php", ["content" => $content, "projects" => $projects, "tasks" => $tasks, "title" => $title, "db_user_name" => $db_user_name]);
+        $page = include_template("layout.php", [
+            "content" => $content,
+            "projects" => $projects,
+            "tasks" => $tasks,
+            "title" => $title,
+            "db_user_name" => $db_user_name]);
 
         print($page);
     } else {
