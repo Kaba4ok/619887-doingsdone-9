@@ -62,7 +62,7 @@
 
                     $user_tasks[] = $task["task"] . " на " . $task["deadline"];
 
-                    $message_part = implode("\n",$user_tasks);
+                    $message_part = implode("\n", $user_tasks);
                 }
             }
 
