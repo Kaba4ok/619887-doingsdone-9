@@ -9,7 +9,15 @@
 
     require_once("functions.php");
 
+    require_once("data.php");
+
     if (isset($_SESSION) && !empty($_SESSION)) {
+
+        foreach ($_SESSION["user"] as $key => $value) {
+            $db_id_user = $value["id_user"];
+            $db_user_name = $value["name"];
+        }
+
         //подключение к БД
         $connect = mysqli_connect("localhost", "root", "", "dvp");
 
@@ -21,20 +29,8 @@
             $error_connect = mysqli_connect_error(); //если подключение не удалось, показать текст ошибки
             echo($error_connect);
         } else {
-            //запрос на показ списка проектов
-            $sql_projects = "SELECT p.*, COUNT(t.id_task) AS tasks_count "
-                ."FROM projects AS p "
-                ."LEFT JOIN tasks AS t "
-                ."ON p.id_project = t.id_project "
-                ."WHERE p.id_user = ? "
-                ."GROUP BY project";
-
-                foreach ($_SESSION["user"] as $key => $value) {
-                    $db_id_user = $value["id_user"];
-                    $db_user_name = $value["name"];
-                }
-
-                $projects = db_fetch_data($connect, $sql_projects, [$db_id_user]);
+            //запрос на показ списка проектов и количества задач в них
+            $projects = get_projects_with_tasks_count($connect, [$db_id_user]);
         }
 
         $content = include_template("add.php", ["projects" => $projects]);
@@ -99,17 +95,13 @@
             if (count($errors)) {
                 $content = include_template("add.php", ["projects" => $projects, "errors" => $errors]);
             } else {
-                //формирование запроса на добавление данных из формы в БД и редирект на главную страницу в случае отсутствия ошибок
+                //добавление данных задачи в БД и редирект на главную страницу в случае отсутствия ошибок
                 $status = 0;
                 $task_name = $_POST["name"];
                 $deadline = $_POST["date"];
                 $id_project = $_POST["project"];
 
-                $sql_task = "INSERT INTO tasks (status, task, file, deadline, id_user, id_project) "
-                ."VALUES "
-                ."(?, ?, ?, ?, ?, ?)";
-
-                db_insert_data($connect, $sql_task, [$status, $task_name, $file, $deadline, $db_id_user, $id_project]);
+                add_task_data_in_db($connect, [$status, $task_name, $file, $deadline, $db_id_user, $id_project]);
 
                 header("Location: /index.php");
             }
