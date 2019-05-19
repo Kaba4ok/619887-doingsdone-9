@@ -38,15 +38,10 @@
             }
 
             $page_items = 5;
-            $tasks_count_arr = get_tasks_count($connect, [$db_id_user]);
-            $tasks_count = 0;
-
-            foreach ($tasks_count_arr as $key => $value) {
-                $tasks_count = $value;
-            }
-
-            $pages_count = ceil($tasks_count["tasks_count"] / $page_items);
             $offset = ($cur_page - 1) * $page_items;
+
+            $tasks_count = get_tasks_count_for_all_projects($connect, [$db_id_user]);
+            $pages_count = ceil($tasks_count / $page_items);
             $pages = range(1, $pages_count);
 
         //запрос на показ списка проектов
@@ -67,6 +62,10 @@
 
             //получение id проекта
             $id_project = $_GET["id_project"];
+
+            $tasks_count = get_tasks_count_for_one_project($connect, [$db_id_user, $id_project]);
+            $pages_count = ceil($tasks_count / $page_items);
+            $pages = range(1, $pages_count);
 
             //запрос на получение списка задач для одного проекта
             $tasks = get_tasks_with_limit_and_offset_from_project($connect, $page_items, $offset, [$id_project, $db_id_user]);
@@ -108,6 +107,10 @@
 
             if (mb_strlen($search_value) >= 3) {
 
+                $tasks_count = get_tasks_count_for_search_fulltext($connect, [$db_id_user, $search_value]);
+                $pages_count = ceil($tasks_count / $page_items);
+                $pages = range(1, $pages_count);
+
                 //запрос на получение списка задач по введеной в строку поиска фразе - полнотекстовый поиск
                 $tasks = get_tasks_for_search_fulltext($connect, $page_items, $offset, [$db_id_user, $search_value]);
 
@@ -118,6 +121,10 @@
             } elseif (mb_strlen($search_value) < 3 && mb_strlen($search_value) !== 0) {
 
                 $search_value = "%" . $search_value . "%";
+
+                $tasks_count = get_tasks_count_for_search_like($connect, [$db_id_user, $search_value]);
+                $pages_count = ceil($tasks_count / $page_items);
+                $pages = range(1, $pages_count);
 
                 //запрос на получение списка задач по введеной в строку поиска фразе - поиск по подстроке
                 $tasks = get_tasks_for_search_like($connect, $page_items, $offset, [$db_id_user, $search_value]);
@@ -130,8 +137,19 @@
 
         //фильтр задач
         if (isset($_GET["filter"]) && ($_GET["filter"] === "today" || $_GET["filter"] === "tomorrow" || $_GET["filter"] === "expired")) {
+
+            $tasks_count = get_tasks_count_for_filtered_tasks($connect, $_GET["filter"], [$db_id_user]);
+            $pages_count = ceil($tasks_count / $page_items);
+            $pages = range(1, $pages_count);
+
             $tasks = get_filtered_tasks($connect, $page_items, $offset, $_GET["filter"], [$db_id_user]);
+
             if (isset($_GET["id_project"])) {
+
+                $tasks_count = get_tasks_count_for_filtered_tasks_from_project($connect, $_GET["filter"], [$id_project, $db_id_user]);
+                $pages_count = ceil($tasks_count / $page_items);
+                $pages = range(1, $pages_count);
+
                 $tasks = get_filtered_tasks_from_project($connect, $page_items, $offset, $_GET["filter"], [$id_project, $db_id_user]);
             }
         } else {

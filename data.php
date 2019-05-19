@@ -3,7 +3,7 @@
     require_once("functions.php");
 
 //получение количества задач
-    function get_tasks_count($link, $data = []) {
+    function get_tasks_count_for_all_projects($link, $data = []) {
 
         $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
             ."FROM tasks "
@@ -11,8 +11,115 @@
 
         $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, $data);
 
-        return $tasks_count_arr;
+        foreach ($tasks_count_arr as $key => $value) {
+            $tasks_count = $value["tasks_count"];
+        }
+
+        return $tasks_count;
     }
+
+    function get_tasks_count_for_one_project($link, $data = []) {
+
+        $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
+            ."FROM tasks "
+            ."WHERE id_user = ? "
+            ."AND id_project = ?";
+
+        $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, $data);
+
+        foreach ($tasks_count_arr as $key => $value) {
+            $tasks_count = $value["tasks_count"];
+        }
+
+        return $tasks_count;
+    }
+
+    function get_tasks_count_for_search_fulltext($link, $data = []) {
+
+        $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
+            ."FROM tasks "
+            ."WHERE id_user = ? "
+            ."AND MATCH(task) AGAINST(?)";
+
+        $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, $data);
+
+        foreach ($tasks_count_arr as $key => $value) {
+            $tasks_count = $value["tasks_count"];
+        }
+
+        return $tasks_count;
+    }
+
+    function get_tasks_count_for_search_like($link, $data = []) {
+
+        $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
+            ."FROM tasks "
+            ."WHERE id_user = ? "
+            ."AND task LIKE ?";
+
+        $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, $data);
+
+        foreach ($tasks_count_arr as $key => $value) {
+            $tasks_count = $value["tasks_count"];
+        }
+
+        return $tasks_count;
+    }
+
+    function get_tasks_count_for_filtered_tasks($link, $filter, $data = []) {
+
+        if ($filter === "today") {
+            $sql_filter = "= CURDATE()";
+        } elseif ($filter === "tomorrow") {
+            $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY)";
+        } elseif ($filter === "expired") {
+            $sql_filter = "< CURDATE()";
+        }
+
+        $sql_filtered_tasks =  "SELECT COUNT(task) AS tasks_count "
+            ."FROM tasks "
+            ."WHERE id_user = ? "
+            ."AND deadline " . $sql_filter;
+
+        $tasks_count_arr = db_fetch_data($link, $sql_filtered_tasks, $data);
+
+        foreach ($tasks_count_arr as $key => $value) {
+            $tasks_count = $value["tasks_count"];
+        }
+
+        return $tasks_count;
+    }
+
+    function get_tasks_count_for_filtered_tasks_from_project($link, $filter, $data = []) {
+
+        if ($filter === "today") {
+            $sql_filter = "= CURDATE()";
+        } elseif ($filter === "tomorrow") {
+            $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY)";
+        } elseif ($filter === "expired") {
+            $sql_filter = "< CURDATE()";
+        }
+
+        $sql_filtered_tasks =  "SELECT COUNT(task) AS tasks_count "
+            ."FROM tasks "
+            ."WHERE id_project = ? "
+            ."AND id_user = ? "
+            ."AND deadline " . $sql_filter;
+
+        $tasks_count_arr = db_fetch_data($link, $sql_filtered_tasks, $data);
+
+        foreach ($tasks_count_arr as $key => $value) {
+            $tasks_count = $value["tasks_count"];
+        }
+
+        return $tasks_count;
+    }
+
+
+
+/*--------------------------------------------------------------------------------------------------*/
+
+
 
 //запрос на показ задач
     function get_tasks_with_limit_and_offset($link, $limit, $offset, $data = []) {
