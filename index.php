@@ -32,7 +32,7 @@
 
         //пагинация
             if (isset($_GET["page"])) {
-                $cur_page = $_GET["page"];
+                $cur_page = (int)$_GET["page"];
             } else {
                 $cur_page = 1;
             }
@@ -78,14 +78,18 @@
         }
 
         //показывать/не показывать выполненные задачи
-        $show_completed_status = 1;
-
         if (isset($_GET["show_completed"])) {
-            $show_completed_checked = $_GET["show_completed"];
 
-            if (!(int)$show_completed_checked) {
-                $show_completed_status = 0;
+            /*foreach ($_GET as $key => $value) {
+                $params[] = $key . "=" . $value;
             }
+
+            $status_link = "/index.php?" . implode("&", $params);*/
+
+            // header("Location: $status_link");
+            // header("Location: $_SERVER[HTTP_REFERER]");
+        } else {
+            $_GET["show_completed"] = 1;
         }
 
         //смена состояния задачи (выполнена/не выполнена)
@@ -156,8 +160,14 @@
             $_GET["filter"] = "all_tasks";
         }
 
+        /*foreach ($_GET as $key => $value) {
+            $z[] = $key . "=" . $value;
+        }
+
+        var_dump(implode("&", $z));*/
+
         $content = include_template("index.php", [
-            "show_completed_status" => $show_completed_status,
+            // "show_completed_status" => $show_completed_status,
             "projects" => $projects,
             "tasks" => $tasks,
             "error_search_message" => $error_search_message,
