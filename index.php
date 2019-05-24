@@ -40,7 +40,7 @@
             $page_items = 5;
             $offset = ($cur_page - 1) * $page_items;
 
-            $tasks_count = get_tasks_count_for_all_projects($connect, [$db_id_user]);
+            $tasks_count = get_tasks_count($connect, [$db_id_user]);
             $pages_count = ceil($tasks_count / $page_items);
             $pages = range(1, $pages_count);
 
@@ -75,21 +75,6 @@
                 header("Location: pages/404.html");
                 exit();
             }
-        }
-
-        //показывать/не показывать выполненные задачи
-        if (isset($_GET["show_completed"])) {
-
-            /*foreach ($_GET as $key => $value) {
-                $params[] = $key . "=" . $value;
-            }
-
-            $status_link = "/index.php?" . implode("&", $params);*/
-
-            // header("Location: $status_link");
-            // header("Location: $_SERVER[HTTP_REFERER]");
-        } else {
-            $_GET["show_completed"] = 1;
         }
 
         //смена состояния задачи (выполнена/не выполнена)
@@ -160,14 +145,61 @@
             $_GET["filter"] = "all_tasks";
         }
 
-        /*foreach ($_GET as $key => $value) {
-            $z[] = $key . "=" . $value;
+        //показывать/не показывать выполненные задачи
+        $show_completed_status = 1;
+
+        if (isset($_GET["show_completed"])) {
+            $show_completed_status = (int)($_GET["show_completed"]);
+
+            if (!$show_completed_status) {
+
+                $tasks_count = get_tasks_count_for_all_projects_with_status_notshow($connect, [$db_id_user]);
+                $pages_count = ceil($tasks_count / $page_items);
+                $pages = range(1, $pages_count);
+
+                $tasks = get_tasks_with_limit_and_offset_for_all_projects_with_status_notshow($connect, $page_items, $offset, [$db_id_user]);
+            }
+
+            if (!$show_completed_status && isset($_GET["filter"])) {
+
+                //запрос на подсчет количества задач для всех проектов с фильтром и статусом 0
+                $tasks_count = get_tasks_count_for_all_projects_with_status_notshow_and_filters($connect, $_GET["filter"], [$db_id_user]);
+                $pages_count = ceil($tasks_count / $page_items);
+                $pages = range(1, $pages_count);
+
+                // запрос на получение задач для всех проектов с фильтром и статусом 0
+                $tasks = get_tasks_with_limit_and_offset_for_all_projects_with_status_notshow_and_filters($connect, $page_items, $offset, $_GET["filter"], [$db_id_user]);
+
+            }
+
+            if (!$show_completed_status && isset($_GET["id_project"])) {
+
+                //запрос на подсчет количества задач для одного проекта и статусом 0
+                $tasks_count = get_tasks_count_with_status_notshow_from_project($connect, [$db_id_user, $id_project]);
+                $pages_count = ceil($tasks_count / $page_items);
+                $pages = range(1, $pages_count);
+
+                // запрос на получение задач для одного проекта и статусом 0
+                $tasks = get_tasks_with_limit_and_offset_with_status_notshow_from_project($connect, $page_items, $offset, [$id_project, $db_id_user]);
+
+            }
+
+            if (!$show_completed_status && (isset($_GET["id_project"]) && isset($_GET["filter"]))) {
+
+                //запрос на подсчет количества задач для одного проекта с фильтром и статусом 0
+                $tasks_count = get_tasks_count_with_status_notshow_and_filter_from_project($connect, $_GET["filter"], [$id_project, $db_id_user]);
+                $pages_count = ceil($tasks_count / $page_items);
+                $pages = range(1, $pages_count);
+
+                // запрос на получение задач для одного проекта с фильтром и статусом 0
+                $tasks = get_tasks_with_limit_and_offset_with_status_notshow_and_filter_from_project($connect, $page_items, $offset, $_GET["filter"], [$id_project, $db_id_user]);
+            }
         }
 
-        var_dump(implode("&", $z));*/
+        var_dump($_GET);
 
         $content = include_template("index.php", [
-            // "show_completed_status" => $show_completed_status,
+            "show_completed_status" => $show_completed_status,
             "projects" => $projects,
             "tasks" => $tasks,
             "error_search_message" => $error_search_message,

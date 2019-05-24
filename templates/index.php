@@ -8,16 +8,16 @@
 
 <div class="tasks-controls">
     <nav class="tasks-switch">
-        <a href="index.php?filter=all_tasks<?php if(isset($_GET['id_project'])): ?>&id_project=<?= $_GET['id_project'] ?><?php endif ?>" class="tasks-switch__item <?php if(isset($_GET['filter']) && $_GET['filter'] === 'all_tasks'): ?>tasks-switch__item--active<?php endif ?>">Все задачи</a>
-        <a href="index.php?filter=today<?php if(isset($_GET['id_project'])): ?>&id_project=<?= $_GET['id_project'] ?><?php endif ?>" class="tasks-switch__item <?php if(isset($_GET['filter']) && $_GET['filter'] === 'today'): ?>tasks-switch__item--active<?php endif ?>">Повестка дня</a>
-        <a href="index.php?filter=tomorrow<?php if(isset($_GET['id_project'])): ?>&id_project=<?= $_GET['id_project'] ?><?php endif ?>" class="tasks-switch__item <?php if(isset($_GET['filter']) && $_GET['filter'] === 'tomorrow'): ?>tasks-switch__item--active<?php endif ?>">Завтра</a>
-        <a href="index.php?filter=expired<?php if(isset($_GET['id_project'])): ?>&id_project=<?= $_GET['id_project'] ?><?php endif ?>" class="tasks-switch__item <?php if(isset($_GET['filter']) && $_GET['filter'] === 'expired'): ?>tasks-switch__item--active<?php endif ?>">Просроченные</a>
+        <a href="index.php?filter=all_tasks<?php if(isset($_GET['id_project'])): ?>&id_project=<?= $_GET['id_project'] ?><?php endif ?><?php if(isset($_GET['show_completed'])): ?>&show_completed=<?= $_GET['show_completed'] ?><?php endif ?>" class="tasks-switch__item <?php if(isset($_GET['filter']) && $_GET['filter'] === 'all_tasks'): ?>tasks-switch__item--active<?php endif ?>">Все задачи</a>
+        <a href="index.php?filter=today<?php if(isset($_GET['id_project'])): ?>&id_project=<?= $_GET['id_project'] ?><?php endif ?><?php if(isset($_GET['show_completed'])): ?>&show_completed=<?= $_GET['show_completed'] ?><?php endif ?>" class="tasks-switch__item <?php if(isset($_GET['filter']) && $_GET['filter'] === 'today'): ?>tasks-switch__item--active<?php endif ?>">Повестка дня</a>
+        <a href="index.php?filter=tomorrow<?php if(isset($_GET['id_project'])): ?>&id_project=<?= $_GET['id_project'] ?><?php endif ?><?php if(isset($_GET['show_completed'])): ?>&show_completed=<?= $_GET['show_completed'] ?><?php endif ?>" class="tasks-switch__item <?php if(isset($_GET['filter']) && $_GET['filter'] === 'tomorrow'): ?>tasks-switch__item--active<?php endif ?>">Завтра</a>
+        <a href="index.php?filter=expired<?php if(isset($_GET['id_project'])): ?>&id_project=<?= $_GET['id_project'] ?><?php endif ?><?php if(isset($_GET['show_completed'])): ?>&show_completed=<?= $_GET['show_completed'] ?><?php endif ?>" class="tasks-switch__item <?php if(isset($_GET['filter']) && $_GET['filter'] === 'expired'): ?>tasks-switch__item--active<?php endif ?>">Просроченные</a>
     </nav>
 
     <label class="checkbox">
         <!--добавить сюда аттрибут "checked", если переменная $show_complete_tasks равна единице-->
         <input class="checkbox__input visually-hidden show_completed" type="checkbox"
-        <?php if(isset($_GET["show_completed"]) && (int)$_GET["show_completed"]): ?> checked <?php endif ?>>
+        <?php if($show_completed_status): ?> checked <?php endif ?>>
         <span class="checkbox__text">Показывать выполненные</span>
     </label>
 </div>
@@ -28,7 +28,7 @@
 
 <table class="tasks">
     <?php foreach ($tasks as $key => $value): ?>
-        <?php if(!($value["status"]) || ($value["status"] && (isset($_GET["show_completed"]) && (int)$_GET["show_completed"]))): ?>
+        <?php if(!($value["status"]) || ($value["status"] && $show_completed_status)): ?>
             <tr class="tasks__item task <?php if ((int)check_time($value["deadline"]) <= 24 && $value["deadline"] !== null && !($value["status"])): ?> task--important <?php endif ?> <?php if($value["status"]): ?> task--completed <?php endif ?>">
                 <td class="task__select">
                     <label class="checkbox task__checkbox">

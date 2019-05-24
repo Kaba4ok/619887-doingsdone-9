@@ -42,7 +42,7 @@
                         <li class="main-navigation__list-item <?php
                             if(isset($_GET['id_project']) && $_GET['id_project'] == $value['id_project']): ?>
                                 main-navigation__list-item--active <?php endif ?>">
-                            <a class="main-navigation__list-item-link" href="/index.php?id_project=<?= $value['id_project'] ?>">
+                            <a class="main-navigation__list-item-link" href="/index.php?id_project=<?= $value['id_project'] ?><?php if(isset($_GET['show_completed'])): ?>&show_completed=<?= $_GET['show_completed'] ?><?php endif ?>">
                                 <?=htmlspecialchars($value["project"]); ?>
                             </a>
                             <span class="main-navigation__list-item-count"><?= $value["tasks_count"]; ?></span>
