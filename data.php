@@ -4,63 +4,239 @@
 
 //получение параметра фильтра
     function get_sql_filter_value($filter) {
+
         if ($filter === "today") {
-            $sql_filter = "= CURDATE()";
+            $sql_filter = "AND deadline = CURDATE()";
         } elseif ($filter === "tomorrow") {
-            $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY)";
+            $sql_filter = "AND deadline = DATE_ADD(CURDATE(), Interval 1 DAY)";
         } elseif ($filter === "expired") {
-            $sql_filter = "< CURDATE()";
+            $sql_filter = "AND deadline < CURDATE()";
         } else {
-            $sql_filter = "all_tasks";
+            $sql_filter = "";
         }
 
         return $sql_filter;
     }
 
-//получение количества задач для всех проектов
-    function get_tasks_count($link, $filter = "all_tasks", $data = []) {
-
-        if (!$filter) {
+//запрос на получение количества задач
+    function get_tasks_count($link, $id_user, $id_project = false, $filter = false) {
+        if ($filter) {
 
             $sql_filter = get_sql_filter_value($filter);
 
             $sql_tasks_count =  "SELECT COUNT(task) AS tasks_count "
             ."FROM tasks "
             ."WHERE id_user = ? "
-            ."AND deadline " . $sql_filter;
+            .$sql_filter;
 
+            if ($id_project) {
+
+                $sql_filter = get_sql_filter_value($filter);
+
+                $sql_tasks_count =  "SELECT COUNT(task) AS tasks_count "
+                ."FROM tasks "
+                ."WHERE id_user = ? "
+                ."AND id_project = ? "
+                .$sql_filter;
+            }
         } else {
 
             $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
             ."FROM tasks "
             ."WHERE id_user = ?";
+
+            if ($id_project) {
+
+                $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
+                ."FROM tasks "
+                ."WHERE id_user = ? "
+                ."AND id_project = ?";
+            }
         }
 
-        $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, $data);
-
-        foreach ($tasks_count_arr as $key => $value) {
-            $tasks_count = $value["tasks_count"];
+        if ($id_project) {
+            $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, [$id_user, $id_project]);
+        } else {
+            $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, [$id_user]);
         }
 
-        return $tasks_count;
+        return $tasks_count_arr[0]["tasks_count"];
     }
 
-    function get_tasks_count_for_one_project($link, $data = []) {
+//запрос на получение списка задач
+    function get_tasks_with_limit_and_offset($link, $limit, $offset, $id_user, $id_project = false, $filter = false) {
 
-        $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
+        if ($filter) {
+
+            $sql_filter = get_sql_filter_value($filter);
+
+            $sql_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
             ."FROM tasks "
             ."WHERE id_user = ? "
-            ."AND id_project = ?";
+            .$sql_filter
+            ."LIMIT " . $limit . " OFFSET " . $offset;
 
-        $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, $data);
+            if ($id_project) {
 
-        foreach ($tasks_count_arr as $key => $value) {
-            $tasks_count = $value["tasks_count"];
+                $sql_filter = get_sql_filter_value($filter);
+
+                $sql_tasks =  "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
+                ."FROM tasks AS t "
+                ."JOIN projects AS p "
+                ."ON t.id_project = p.id_project "
+                ."WHERE t.id_user = ? "
+                ."AND t.id_project = ? "
+                .$sql_filter
+                ."LIMIT " . $limit . " OFFSET " . $offset;
+            }
+        } else {
+
+            $sql_tasks = "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, p.project, t.status "
+            ."FROM tasks AS t "
+            ."JOIN projects AS p "
+            ."ON p.id_project = t.id_project "
+            ."WHERE t.id_user = ? "
+            ."LIMIT " . $limit . " OFFSET " . $offset;
+
+            if ($id_project) {
+
+                $sql_tasks = "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
+                ."FROM tasks AS t "
+                ."JOIN projects AS p "
+                ."ON t.id_project = p.id_project "
+                ."WHERE t.id_user = ? "
+                ."AND t.id_project = ? "
+                ."LIMIT " . $limit . " OFFSET " . $offset;
+            }
         }
 
-        return $tasks_count;
+        if ($id_project) {
+            $tasks = db_fetch_data($link, $sql_tasks, [$id_user, $id_project]);
+        } else {
+            $tasks = db_fetch_data($link, $sql_tasks, [$id_user]);
+        }
+
+        return $tasks;
     }
 
+
+/*--------------------------------- КОЛИЧЕСТВО ЗАДАЧ СТАТУС 0 -----------------------------------*/
+
+//запрос на получение количества задач со статусом 0
+    function get_tasks_count_with_status_notshow($link, $id_user, $id_project = false, $filter = false) {
+
+        if ($filter) {
+
+            $sql_filter = get_sql_filter_value($filter);
+
+            $sql_tasks_count =  "SELECT COUNT(task) AS tasks_count "
+            ."FROM tasks "
+            ."WHERE id_user = ? "
+            ."AND status = 0 "
+            .$sql_filter;
+
+            if ($id_project) {
+
+                $sql_filter = get_sql_filter_value($filter);
+
+                $sql_tasks_count =  "SELECT COUNT(task) AS tasks_count "
+                ."FROM tasks "
+                ."WHERE id_user = ? "
+                ."AND id_project = ? "
+                ."AND status = 0 "
+                .$sql_filter;
+            }
+        } else {
+
+            $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
+            ."FROM tasks "
+            ."WHERE id_user = ? "
+            ."AND status = 0";
+
+            if ($id_project) {
+
+                $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
+                ."FROM tasks "
+                ."WHERE id_user = ? "
+                ."AND id_project = ? "
+                ."AND status = 0";
+            }
+        }
+
+        if ($id_project) {
+            $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, [$id_user, $id_project]);
+        } else {
+            $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, [$id_user]);
+        }
+
+        return $tasks_count_arr[0]["tasks_count"];
+    }
+
+
+/*--------------------------------- СПИСОК ЗАДАЧ СТАТУС 0 -----------------------------------*/
+
+//запрос на получение списка задач со статусом 0
+    function get_tasks_with_limit_and_offset_with_status_notshow($link, $limit, $offset, $id_user, $id_project = false, $filter = false) {
+
+        if ($filter) {
+
+            $sql_filter = get_sql_filter_value($filter);
+
+            $sql_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
+            ."FROM tasks "
+            ."WHERE id_user = ? "
+            ."AND status = 0 "
+            .$sql_filter
+            ."LIMIT " . $limit . " OFFSET " . $offset;
+
+            if ($id_project) {
+
+                $sql_filter = get_sql_filter_value($filter);
+
+                $sql_tasks =  "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
+                ."FROM tasks AS t "
+                ."JOIN projects AS p "
+                ."ON t.id_project = p.id_project "
+                ."WHERE t.id_user = ? "
+                ."AND t.id_project = ? "
+                ."AND status = 0 "
+                .$sql_filter
+                ."LIMIT " . $limit . " OFFSET " . $offset;
+            }
+        } else {
+
+            $sql_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
+            ."FROM tasks "
+            ."WHERE id_user = ? "
+            ."AND status = 0 "
+            ."LIMIT " . $limit . " OFFSET " . $offset;
+
+            if ($id_project) {
+
+                $sql_tasks = "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
+                ."FROM tasks AS t "
+                ."JOIN projects AS p "
+                ."ON t.id_project = p.id_project "
+                ."WHERE t.id_user = ? "
+                ."AND t.id_project = ? "
+                ."AND status = 0 "
+                ."LIMIT " . $limit . " OFFSET " . $offset;
+            }
+        }
+
+        if ($id_project) {
+            $tasks = db_fetch_data($link, $sql_tasks, [$id_user, $id_project]);
+        } else {
+            $tasks = db_fetch_data($link, $sql_tasks, [$id_user]);
+        }
+
+        return $tasks;
+    }
+
+
+/*-----------------------------------------------ПОИСК---------------------------------------------------*/
+
+//запрос на получение количества задач для полнотектового поиска
     function get_tasks_count_for_search_fulltext($link, $data = []) {
 
         $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
@@ -77,6 +253,7 @@
         return $tasks_count;
     }
 
+//запрос на получение количества задач для поиска по подстроке
     function get_tasks_count_for_search_like($link, $data = []) {
 
         $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
@@ -91,322 +268,6 @@
         }
 
         return $tasks_count;
-    }
-
-    function get_tasks_count_for_filtered_tasks($link, $filter, $data = []) {
-
-        if ($filter === "today") {
-            $sql_filter = "= CURDATE()";
-        } elseif ($filter === "tomorrow") {
-            $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY)";
-        } elseif ($filter === "expired") {
-            $sql_filter = "< CURDATE()";
-        }
-
-        $sql_filtered_tasks =  "SELECT COUNT(task) AS tasks_count "
-            ."FROM tasks "
-            ."WHERE id_user = ? "
-            ."AND deadline " . $sql_filter;
-
-        $tasks_count_arr = db_fetch_data($link, $sql_filtered_tasks, $data);
-
-        foreach ($tasks_count_arr as $key => $value) {
-            $tasks_count = $value["tasks_count"];
-        }
-
-        return $tasks_count;
-    }
-
-    function get_tasks_count_for_filtered_tasks_from_project($link, $filter, $data = []) {
-
-        if ($filter === "today") {
-            $sql_filter = "= CURDATE()";
-        } elseif ($filter === "tomorrow") {
-            $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY)";
-        } elseif ($filter === "expired") {
-            $sql_filter = "< CURDATE()";
-        }
-
-        $sql_filtered_tasks =  "SELECT COUNT(task) AS tasks_count "
-            ."FROM tasks "
-            ."WHERE id_project = ? "
-            ."AND id_user = ? "
-            ."AND deadline " . $sql_filter;
-
-        $tasks_count_arr = db_fetch_data($link, $sql_filtered_tasks, $data);
-
-        foreach ($tasks_count_arr as $key => $value) {
-            $tasks_count = $value["tasks_count"];
-        }
-
-        return $tasks_count;
-    }
-
-    function get_tasks_count_for_all_projects_with_status_notshow($link, $data = []) {
-
-        $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
-            ."FROM tasks "
-            ."WHERE id_user = ? "
-            ."AND status = 0";
-
-        $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, $data);
-
-        foreach ($tasks_count_arr as $key => $value) {
-            $tasks_count = $value["tasks_count"];
-        }
-
-        return $tasks_count;
-    }
-
-    function get_tasks_with_limit_and_offset_for_all_projects_with_status_notshow($link, $limit, $offset, $data = []) {
-
-        $sql_status_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
-            ."FROM tasks "
-            ."WHERE id_user = ? "
-            ."AND status = 0 "
-            ."LIMIT " . $limit . " OFFSET " . $offset;
-
-        $tasks = db_fetch_data($link, $sql_status_tasks, $data);
-
-        return $tasks;
-    }
-
-    function get_tasks_count_for_all_projects_with_status_notshow_and_filters($link, $filter, $data = []) {
-
-        if ($filter === "all_tasks") {
-
-            $sql_filtered_tasks =  "SELECT COUNT(task) AS tasks_count "
-            ."FROM tasks "
-            ."WHERE id_user = ? "
-            ."AND status = 0";
-
-            $tasks_count_arr = db_fetch_data($link, $sql_filtered_tasks, $data);
-
-        } else {
-
-            if ($filter === "today") {
-                $sql_filter = "= CURDATE()";
-            } elseif ($filter === "tomorrow") {
-                $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY)";
-            } elseif ($filter === "expired") {
-                $sql_filter = "< CURDATE()";
-            }
-
-            $sql_filtered_tasks =  "SELECT COUNT(task) AS tasks_count "
-                ."FROM tasks "
-                ."WHERE id_user = ? "
-                ."AND status = 0 "
-                ."AND deadline " . $sql_filter;
-
-            $tasks_count_arr = db_fetch_data($link, $sql_filtered_tasks, $data);
-        }
-
-        foreach ($tasks_count_arr as $key => $value) {
-            $tasks_count = $value["tasks_count"];
-        }
-
-        return $tasks_count;
-    }
-
-    function get_tasks_with_limit_and_offset_for_all_projects_with_status_notshow_and_filters($link, $limit, $offset, $filter, $data = []) {
-
-        if ($filter === "all_tasks") {
-
-            $sql_filtered_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
-            ."FROM tasks "
-            ."WHERE id_user = ? "
-            ."AND status = 0 "
-            ."LIMIT " . $limit . " OFFSET " . $offset;
-
-            $tasks = db_fetch_data($link, $sql_filtered_tasks, $data);
-
-        } else {
-
-            if ($filter === "today") {
-                $sql_filter = "= CURDATE() ";
-            } elseif ($filter === "tomorrow") {
-                $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY) ";
-            } elseif ($filter === "expired") {
-                $sql_filter = "< CURDATE() ";
-            }
-
-            $sql_filtered_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
-                ."FROM tasks "
-                ."WHERE id_user = ? "
-                ."AND status = 0 "
-                ."AND deadline " . $sql_filter
-                ."LIMIT " . $limit . " OFFSET " . $offset;
-
-            $tasks = db_fetch_data($link, $sql_filtered_tasks, $data);
-        }
-
-        return $tasks;
-    }
-
-    function get_tasks_count_with_status_notshow_from_project($link, $data = []) {
-
-        $sql_tasks_count = "SELECT COUNT(task) AS tasks_count "
-            ."FROM tasks "
-            ."WHERE id_user = ? "
-            ."AND id_project = ? "
-            ."AND status = 0";
-
-        $tasks_count_arr = db_fetch_data($link, $sql_tasks_count, $data);
-
-        foreach ($tasks_count_arr as $key => $value) {
-            $tasks_count = $value["tasks_count"];
-        }
-
-        return $tasks_count;
-    }
-
-    function get_tasks_with_limit_and_offset_with_status_notshow_from_project($link, $limit, $offset, $data = []) {
-
-        $sql_id_project = "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
-            ."FROM tasks AS t "
-            ."JOIN projects AS p "
-            ."ON t.id_project = p.id_project "
-            ."WHERE t.id_project = ? "
-            ."AND t.id_user = ? "
-            ."AND status = 0 "
-            ."LIMIT " . $limit . " OFFSET " . $offset;
-
-        $tasks = db_fetch_data($link, $sql_id_project, $data);
-
-        return $tasks;
-    }
-
-    function get_tasks_count_with_status_notshow_and_filter_from_project($link, $filter, $data = []) {
-
-        if ($filter === "all_tasks") {
-
-            $sql_filtered_tasks =  "SELECT COUNT(task) AS tasks_count "
-            ."FROM tasks "
-            ."WHERE id_project = ? "
-            ."AND id_user = ? "
-            ."AND status = 0";
-
-            $tasks_count_arr = db_fetch_data($link, $sql_filtered_tasks, $data);
-
-        } else {
-
-            if ($filter === "today") {
-                $sql_filter = "= CURDATE()";
-            } elseif ($filter === "tomorrow") {
-                $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY)";
-            } elseif ($filter === "expired") {
-                $sql_filter = "< CURDATE()";
-            }
-
-            $sql_filtered_tasks =  "SELECT COUNT(task) AS tasks_count "
-                ."FROM tasks "
-                ."WHERE id_project = ? "
-                ."AND id_user = ? "
-                ."AND status = 0 "
-                ."AND deadline " . $sql_filter;
-
-            $tasks_count_arr = db_fetch_data($link, $sql_filtered_tasks, $data);
-        }
-
-        foreach ($tasks_count_arr as $key => $value) {
-            $tasks_count = $value["tasks_count"];
-        }
-
-        return $tasks_count;
-    }
-
-    function get_tasks_with_limit_and_offset_with_status_notshow_and_filter_from_project($link, $limit, $offset, $filter, $data = []) {
-
-        if ($filter === "all_tasks") {
-
-            $sql_filtered_tasks =  "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
-                ."FROM tasks AS t "
-                ."JOIN projects AS p "
-                ."ON t.id_project = p.id_project "
-                ."WHERE t.id_project = ? "
-                ."AND t.id_user = ? "
-                ."AND status = 0 "
-                ."LIMIT " . $limit . " OFFSET " . $offset;
-
-            $tasks = db_fetch_data($link, $sql_filtered_tasks, $data);
-
-        } else {
-
-            if ($filter === "today") {
-                $sql_filter = "= CURDATE() ";
-            } elseif ($filter === "tomorrow") {
-                $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY) ";
-            } elseif ($filter === "expired") {
-                $sql_filter = "< CURDATE() ";
-            }
-
-            $sql_filtered_tasks =  "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
-                ."FROM tasks AS t "
-                ."JOIN projects AS p "
-                ."ON t.id_project = p.id_project "
-                ."WHERE t.id_project = ? "
-                ."AND t.id_user = ? "
-                ."AND status = 0 "
-                ."AND deadline " . $sql_filter
-                ."LIMIT " . $limit . " OFFSET " . $offset;
-
-            $tasks = db_fetch_data($link, $sql_filtered_tasks, $data);
-        }
-
-        return $tasks;
-    }
-
-
-
-/*--------------------------------------------------------------------------------------------------*/
-
-
-
-//запрос на показ задач
-    function get_tasks_with_limit_and_offset($link, $limit, $offset, $data = []) {
-
-        $sql_tasks = "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, p.project, t.status "
-            ."FROM tasks AS t "
-            ."JOIN projects AS p "
-            ."ON p.id_project = t.id_project "
-            ."WHERE t.id_user = ? "
-            ."LIMIT " . $limit . " OFFSET " . $offset;
-
-        $tasks = db_fetch_data($link, $sql_tasks, $data);
-
-        return $tasks;
-    }
-
-//запрос на получение списка задач для одного проекта
-    function get_tasks_with_limit_and_offset_from_project($link, $limit, $offset, $data = []) {
-
-        $sql_id_project = "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
-            ."FROM tasks AS t "
-            ."JOIN projects AS p "
-            ."ON t.id_project = p.id_project "
-            ."WHERE t.id_project = ? "
-            ."AND t.id_user = ? "
-            ."LIMIT " . $limit . " OFFSET " . $offset;
-
-        $tasks = db_fetch_data($link, $sql_id_project, $data);
-
-        return $tasks;
-    }
-
-//смена состояния задачи (выполнена/не выполнена)
-    function change_task_status($link, $check, $data) {
-
-        $status = 0;
-
-        if ((int)$check) {
-            $status = 1;
-        }
-
-        $sql_task_status = "UPDATE tasks AS t "
-            ."SET status = ? "
-            ."WHERE t.id_task = ?";
-
-        db_insert_data($link, $sql_task_status, [$status, $data]);
     }
 
 //запрос на получение списка задач по введеной в строку поиска фразе - полнотекстовый поиск
@@ -437,54 +298,27 @@
         return $tasks;
     }
 
-//получение списка всех задач в заисимости от значения фильтра
-    function get_filtered_tasks($link, $limit, $offset, $filter, $data = []) {
 
-        if ($filter === "today") {
-            $sql_filter = "= CURDATE() ";
-        } elseif ($filter === "tomorrow") {
-            $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY) ";
-        } elseif ($filter === "expired") {
-            $sql_filter = "< CURDATE() ";
+//------------------------------------------------------------------------------//
+
+
+//смена состояния задачи (выполнена/не выполнена)
+    function change_task_status($link, $check, $data) {
+
+        $status = 0;
+
+        if ((int)$check) {
+            $status = 1;
         }
 
-        $sql_filtered_tasks =  "SELECT id_task, task, file, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline, status "
-            ."FROM tasks "
-            ."WHERE id_user = ? "
-            ."AND deadline " . $sql_filter
-            ."LIMIT " . $limit . " OFFSET " . $offset;
+        $sql_task_status = "UPDATE tasks AS t "
+            ."SET status = ? "
+            ."WHERE t.id_task = ?";
 
-        $tasks = db_fetch_data($link, $sql_filtered_tasks, $data);
-
-        return $tasks;
+        db_insert_data($link, $sql_task_status, [$status, $data]);
     }
 
-//получение списка задач в заисимости от значения фильтра в одном проекте
-    function get_filtered_tasks_from_project($link, $limit, $offset, $filter, $data = []) {
-
-        if ($filter === "today") {
-            $sql_filter = "= CURDATE() ";
-        } elseif ($filter === "tomorrow") {
-            $sql_filter = "= DATE_ADD(CURDATE(), Interval 1 DAY) ";
-        } elseif ($filter === "expired") {
-            $sql_filter = "< CURDATE() ";
-        }
-
-        $sql_filtered_tasks =  "SELECT t.id_task, t.task, t.file, DATE_FORMAT(t.deadline, '%d.%m.%Y') AS deadline, t.status, p.project "
-            ."FROM tasks AS t "
-            ."JOIN projects AS p "
-            ."ON t.id_project = p.id_project "
-            ."WHERE t.id_project = ? "
-            ."AND t.id_user = ? "
-            ."AND deadline " . $sql_filter
-            ."LIMIT " . $limit . " OFFSET " . $offset;
-
-        $tasks = db_fetch_data($link, $sql_filtered_tasks, $data);
-
-        return $tasks;
-    }
-
-//получение из БД проектов с количеством задач
+//запрос на получение проектов с количеством задач
     function get_projects_with_tasks_count($link, $data = []) {
 
         $sql_projects = "SELECT p.*, COUNT(t.id_task) AS tasks_count "
@@ -507,6 +341,74 @@
             ."(?, ?, ?, ?, ?, ?)";
 
         db_insert_data($link, $sql_task, $data);
+    }
+
+//запрос на получение данных о пользователе по введенному email
+    function get_user_data($link, $data) {
+        $sql = "SELECT * "
+        ."FROM users "
+        ."WHERE email = ?";
+
+        $user = db_fetch_data($link, $sql, [$data]);
+
+        return $user;
+    }
+
+//запрос на получение списка пользователей и количества задач у них с истекающим сроком и статусом 0
+    function get_users_with_count_tasks_deadline_curdate($link) {
+
+        $sql_users = "SELECT u.id_user, name, email, COUNT(task) AS tasks_count "
+        ."FROM users AS u "
+        ."JOIN tasks AS t "
+        ."ON u.id_user = t.id_user "
+        ."WHERE STATUS = 0 "
+        ."AND deadline = CURDATE() "
+        ."GROUP BY name";
+
+        $users = db_fetch_data($link, $sql_users, []);
+
+        return $users;
+    }
+
+//запрос на получение списка задач с истекающим сроком и статусом 0
+    function get_tasks_deadline_curdate($link) {
+
+        $sql_tasks = "SELECT id_user, task, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline "
+        ."FROM tasks "
+        ."WHERE STATUS = 0 "
+        ."AND deadline = CURDATE()";
+
+        $tasks = db_fetch_data($link, $sql_tasks, []);
+
+        return $tasks;
+    }
+
+//запрос на добавление проекта в БД
+    function add_project_in_db($link, $id_user, $project_name) {
+        $sql_project = "INSERT INTO projects (id_user, project) "
+        ."VALUES (?, ?)";
+
+        db_insert_data($link, $sql_project, [$id_user, $project_name]);
+    }
+
+//запрос на получение списка пользователей
+    function get_users($link) {
+
+        $sql = "SELECT * "
+        ."FROM users";
+
+        $users = db_fetch_data($link, $sql, []);
+
+        return $users;
+    }
+
+//запрос на добавление данных пользователя в БД
+    function add_users($link, $data = []) {
+        $sql = "INSERT INTO users (email, password, name) "
+        ."VALUES "
+        ."(?, ?, ?)";
+
+        db_insert_data($link, $sql, $data);
     }
 
 ?>

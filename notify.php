@@ -3,6 +3,7 @@
     //подключаем composer
     require_once("vendor/autoload.php");
     require_once("functions.php");
+    require_once("data.php");
 
     $transport = new Swift_SmtpTransport("phpdemo.ru", 25);
     $transport -> setUsername("keks@phpdemo.ru");
@@ -22,23 +23,13 @@
         echo($error_connect);
     }
 
-    $sql_users = "SELECT u.id_user, name, email, COUNT(task) AS tasks_count "
-        ."FROM users AS u "
-        ."JOIN tasks AS t "
-        ."ON u.id_user = t.id_user "
-        ."WHERE STATUS = 0 "
-        ."AND deadline = CURDATE() "
-        ."GROUP BY name";
+//запрос на получение списка пользователей и количества задач у них с истекающим сроком
+    $users = get_users_with_count_tasks_deadline_curdate($connect);
 
-    $users = db_fetch_data($connect, $sql_users, []);
+//запрос на получение списка задач с истекающим сроком
+    $tasks = get_tasks_deadline_curdate($connect);
 
-    $sql_tasks = "SELECT id_user, task, DATE_FORMAT(deadline, '%d.%m.%Y') AS deadline "
-    ."FROM tasks "
-    ."WHERE STATUS = 0 "
-    ."AND deadline = CURDATE()";
-
-    $tasks = db_fetch_data($connect, $sql_tasks, []);
-
+//формирование письма
     foreach ($users as $user) {
 
         $message = new Swift_Message();

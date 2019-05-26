@@ -8,6 +8,7 @@
     $title = "Дела в порядке";
 
     require_once("functions.php");
+    require_once("data.php");
 
     if (isset($_SESSION) && !empty($_SESSION)) {
         //подключение к БД
@@ -22,19 +23,12 @@
             echo($error_connect);
         } else {
             //запрос на показ списка проектов
-            $sql_projects = "SELECT p.*, COUNT(t.id_task) AS tasks_count "
-                ."FROM projects AS p "
-                ."LEFT JOIN tasks AS t "
-                ."ON p.id_project = t.id_project "
-                ."WHERE p.id_user = ? "
-                ."GROUP BY project";
-
             foreach ($_SESSION["user"] as $key => $value) {
                 $db_id_user = $value["id_user"];
                 $db_user_name = $value["name"];
             }
 
-            $projects = db_fetch_data($connect, $sql_projects, [$db_id_user]);
+            $projects = get_projects_with_tasks_count($connect, [$db_id_user]);
         }
 
         $content = include_template("project_add.php", ["projects" => $projects]);
@@ -63,11 +57,7 @@
                 $project_name = $_POST["name"];
                 $id_user = $db_id_user;
 
-                $sql_project = "INSERT INTO projects (id_user, project) "
-                ."VALUES "
-                ."(?, ?)";
-
-                db_insert_data($connect, $sql_project, [$id_user, $project_name]);
+                add_project_in_db($connect, $id_user, $project_name);
 
                 header("Location: /index.php");
             }

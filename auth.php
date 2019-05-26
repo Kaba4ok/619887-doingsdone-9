@@ -7,6 +7,8 @@
 
     require_once("functions.php");
 
+    require_once("data.php");
+
     $title = "Дела в порядке";
 
     //подключение к БД
@@ -29,10 +31,8 @@
 
         //ищем в БД юзера с введенным email и получаем массив с его данными
         $email = $_POST["email"];
-        $sql = "SELECT * "
-            ."FROM users "
-            ."WHERE email = ?";
-        $user = db_fetch_data($connect, $sql, [$email]);
+
+        $user = get_user_data($connect, $email);
 
         //создание переменной с хэшом пароля из БД
         if (!empty($user)) {
