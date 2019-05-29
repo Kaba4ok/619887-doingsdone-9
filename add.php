@@ -1,42 +1,19 @@
 <?php
 
-    session_start();
-
-    //подключаем composer
-    require_once("vendor/autoload.php");
-
-    $title = "Дела в порядке";
-
-    require_once("functions.php");
-
-    require_once("data.php");
+    require_once("init.php");
 
     if (isset($_SESSION) && !empty($_SESSION)) {
-
         foreach ($_SESSION["user"] as $key => $value) {
             $db_id_user = $value["id_user"];
             $db_user_name = $value["name"];
         }
 
-        //подключение к БД
-        $connect = mysqli_connect("localhost", "root", "", "dvp");
-
-        //установка кодировки ресурса соединения
-        mysqli_set_charset($connect, "utf8");
-
-        //проверка подключения
-        if (!$connect) {
-            $error_connect = mysqli_connect_error(); //если подключение не удалось, показать текст ошибки
-            echo($error_connect);
-        } else {
-            //запрос на показ списка проектов и количества задач в них
-            $projects = get_projects_with_tasks_count($connect, [$db_id_user]);
-        }
+        //запрос на показ списка проектов и количества задач в них
+        $projects = get_projects_with_tasks_count($connect, [$db_id_user]);
 
         $content = include_template("add.php", ["projects" => $projects]);
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
             $required = ["name", "project"];
 
             $errors = [];
@@ -88,7 +65,6 @@
                 move_uploaded_file($_FILES["file"]["tmp_name"], $file_path . $file_name);
 
                 $file = $file_url;
-
             }
 
             //проверка на наличие ошибок
@@ -111,4 +87,3 @@
 
         print($page);
     }
-?>

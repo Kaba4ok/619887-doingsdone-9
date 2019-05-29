@@ -1,41 +1,21 @@
 <?php
 
-    session_start();
-
-    //подключаем composer
-    require_once("vendor/autoload.php");
-
-    $title = "Дела в порядке";
-
-    require_once("functions.php");
-    require_once("data.php");
+    require_once("init.php");
 
     if (isset($_SESSION) && !empty($_SESSION)) {
-        //подключение к БД
-        $connect = mysqli_connect("localhost", "root", "", "dvp");
 
-        //установка кодировки ресурса соединения
-        mysqli_set_charset($connect, "utf8");
-
-        //проверка подключения
-        if (!$connect) {
-            $error_connect = mysqli_connect_error(); //если подключение не удалось, показать текст ошибки
-            echo($error_connect);
-        } else {
-            //запрос на показ списка проектов
-            foreach ($_SESSION["user"] as $key => $value) {
-                $db_id_user = $value["id_user"];
-                $db_user_name = $value["name"];
-            }
-
-            $projects = get_projects_with_tasks_count($connect, [$db_id_user]);
+        //запрос на показ списка проектов
+        foreach ($_SESSION["user"] as $key => $value) {
+            $db_id_user = $value["id_user"];
+            $db_user_name = $value["name"];
         }
+
+        $projects = get_projects_with_tasks_count($connect, [$db_id_user]);
 
         $content = include_template("project_add.php", ["projects" => $projects]);
 
         //отправка данных из формы
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
             $errors = [];
 
             // проверка на заполненность обязательных полей
@@ -69,4 +49,3 @@
     } else {
         header("Location: guest.php");
     }
-?>

@@ -1,9 +1,6 @@
 <?php
 
-    //подключаем composer
-    require_once("vendor/autoload.php");
-    require_once("functions.php");
-    require_once("data.php");
+    require_once("init.php");
 
     $transport = new Swift_SmtpTransport("phpdemo.ru", 25);
     $transport -> setUsername("keks@phpdemo.ru");
@@ -14,15 +11,6 @@
     $logger = new Swift_Plugins_Loggers_ArrayLogger();
     $mailer -> registerPlugin(new Swift_Plugins_LoggerPlugin($logger));
 
-    $connect = mysqli_connect("localhost", "root", "", "dvp");
-
-    mysqli_set_charset($connect, "utf8");
-
-    if (!$connect) {
-        $error_connect = mysqli_connect_error();
-        echo($error_connect);
-    }
-
 //запрос на получение списка пользователей и количества задач у них с истекающим сроком
     $users = get_users_with_count_tasks_deadline_curdate($connect);
 
@@ -31,7 +19,6 @@
 
 //формирование письма
     foreach ($users as $user) {
-
         $message = new Swift_Message();
         $message -> setSubject("Уведомление от сервиса «Дела в порядке»");
         $message -> setFrom(["keks@phpdemo.ru" => "Дела в порядке"]);
@@ -50,7 +37,6 @@
 
             foreach ($tasks as $task) {
                 if ($task["id_user"] === $user["id_user"]) {
-
                     $user_tasks[] = $task["task"] . " на " . $task["deadline"];
 
                     $message_part = implode("\n", $user_tasks);
@@ -67,9 +53,6 @@
 
     if ($result) {
         print("Рассылка успешно отправлена");
-    }
-    else {
+    } else {
         print("Не удалось отправить рассылку: " . $logger->dump());
     }
-
-?>

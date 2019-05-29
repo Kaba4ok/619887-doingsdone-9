@@ -1,32 +1,10 @@
 <?php
 
-    session_start();
-
-    //подключаем composer
-    require_once("vendor/autoload.php");
-
-    require_once("functions.php");
-
-    require_once("data.php");
-
-    $title = "Дела в порядке";
-
-    //подключение к БД
-    $connect = mysqli_connect("localhost", "root", "", "dvp");
-
-    //установка кодировки ресурса соединения
-    mysqli_set_charset($connect, "utf8");
-
-    //проверка подключения
-    if (!$connect) {
-        $error_connect = mysqli_connect_error(); //если подключение не удалось, показать текст ошибки
-        echo($error_connect);
-    }
+    require_once("init.php");
 
     $content = include_template("auth.php", []);
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
         $errors = [];
 
         //ищем в БД юзера с введенным email и получаем массив с его данными
@@ -81,5 +59,3 @@
     $page = include_template("layout-unlogin.php", ["content" => $content, "title" => $title]);
 
     print($page);
-
-?>

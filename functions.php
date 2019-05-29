@@ -4,7 +4,8 @@
      * @param string $value Дата окончания срока выполнения задачи
      * @return float Количество часов до окончания срока выполнения задачи
      */
-    function check_time($value) {
+    function check_time($value)
+    {
         if ($value) {
             $sec_in_hour = 3600;
             $cur_time = strtotime("now");
@@ -21,7 +22,8 @@
      * @param array $data Ассоциативный массив с данными для шаблона
      * @return string Итоговый HTML
      */
-    function include_template($name, array $data = []) {
+    function include_template($name, array $data = [])
+    {
         $name = 'templates/' . $name;
         $result = '';
 
@@ -47,7 +49,8 @@
      *
      * @return mysqli_stmt Подготовленное выражение
      */
-    function db_get_prepare_stmt($link, $sql, $data = []) {
+    function db_get_prepare_stmt($link, $sql, $data = [])
+    {
         $stmt = mysqli_prepare($link, $sql);
 
         if ($stmt === false) {
@@ -64,11 +67,9 @@
 
                 if (is_int($value)) {
                     $type = 'i';
-                }
-                else if (is_string($value)) {
+                } elseif (is_string($value)) {
                     $type = 's';
-                }
-                else if (is_double($value)) {
+                } elseif (is_double($value)) {
                     $type = 'd';
                 }
 
@@ -101,7 +102,8 @@
      *
      * @return $result Массив с данными
      */
-    function db_fetch_data($link, $sql, $data = []) {
+    function db_fetch_data($link, $sql, $data = [])
+    {
         $result = [];
         $stmt = db_get_prepare_stmt($link, $sql, $data);
         mysqli_stmt_execute($stmt);
@@ -123,7 +125,8 @@
      *
      * @return $result bool true при успешном добавлении данных в БД
      */
-    function db_insert_data($link, $sql, $data = []) {
+    function db_insert_data($link, $sql, $data = [])
+    {
         $stmt = db_get_prepare_stmt($link, $sql, $data);
         $result = mysqli_stmt_execute($stmt);
 
@@ -148,7 +151,8 @@
      *
      * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД', иначе false
      */
-    function is_date_valid(string $date) : bool {
+    function is_date_valid(string $date) : bool
+    {
         $format_to_check = 'Y-m-d';
         $dateTimeObj = date_create_from_format($format_to_check, $date);
 
@@ -161,7 +165,8 @@
      * @param $path string Путь к файлу
      * @return $name string Имя файла
      */
-    function get_file_name($path) {
+    function get_file_name($path)
+    {
         $separate_path = explode("___", $path);
         $result = array_pop($separate_path);
         $name = mb_substr($result, 0, 25);
@@ -172,4 +177,3 @@
 
         return $name;
     }
-?>
