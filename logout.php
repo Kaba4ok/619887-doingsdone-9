@@ -1,8 +1,7 @@
 <?php
-    session_start();
 
-    require_once("vendor/autoload.php");
+    require_once("init.php");
 
-    unset($_SESSION["user"]);
+    $_SESSION = array();
 
     header("Location: /index.php");

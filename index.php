@@ -27,8 +27,16 @@
         $tasks = get_tasks($connect, $page_items, $offset, $db_id_user);
 
         //список задач для одного проекта
+        $project_message = false;
+
         if (isset($_GET["id_project"])) {
-            if ($_GET["id_project"] === "") {
+            $projects_ids = [];
+
+            foreach ($projects as $key => $value) {
+                $projects_ids[] = $value["id_project"];
+            }
+
+            if ($_GET["id_project"] === "" || !in_array($_GET["id_project"], $projects_ids)) {
                 http_response_code(404);
                 header("Location: pages/404.html");
                 exit();
@@ -43,9 +51,7 @@
             $tasks = get_tasks($connect, $page_items, $offset, $db_id_user, $id_project);
 
             if (empty($tasks)) {
-                http_response_code(404);
-                header("Location: pages/404.html");
-                exit();
+                $project_message = true;
             }
         }
 
@@ -109,7 +115,6 @@
         }
 
         if (isset($_SESSION["show_completed"])) {
-
             if ((int)$_SESSION["show_completed"] === 0) {
                 $tasks_count = get_tasks_count($connect, $db_id_user, false, false, true);
 
@@ -149,6 +154,7 @@
 
         $content = include_template("index.php", [
             "tasks" => $tasks,
+            "project_message" => $project_message,
             "error_search_message" => $error_search_message,
             "cur_page" => $cur_page,
             "pages_count" => $pages_count,

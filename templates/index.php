@@ -26,6 +26,10 @@
     <p>Ничего не найдено по вашему запросу</p>
 <?php endif ?>
 
+<?php if(isset($_GET["id_project"]) && $project_message): ?>
+    <p>В этом проекте пока нет задач</p>
+<?php endif ?>
+
 <table class="tasks">
     <?php foreach ($tasks as $key => $value): ?>
         <?php if(!($value["status"]) || ($value["status"] && (isset($_SESSION['show_completed']) && (int)$_SESSION['show_completed'] === 1))): ?>
