@@ -23,6 +23,10 @@
                 $errors["name"] = "Это поле надо заполнить";
             }
 
+            if (mb_strlen($_POST["name"]) > 18) {
+                $errors["name"] = "Значение данного поля не должно содержать более 18 символов";
+            }
+
             foreach ($projects as $key => $value) {
                 if ($value["project"] === $_POST["name"]) {
                     $errors["name"] = "Такой проект уже существует";

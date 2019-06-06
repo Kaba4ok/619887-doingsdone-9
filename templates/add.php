@@ -22,7 +22,7 @@
 
     <select class="form__input form__input--select <?= $error_class; ?>" name="project" id="project">
       <?php foreach ($projects as $value): ?>
-        <option value="<?= $value['id_project'] ?>" <?php if($task_project === $value['id_project']): ?> selected <?php endif ?> ><?=htmlspecialchars($value["project"]); ?></option>
+        <option value="<?= $value['id_project'] ?>" <?php if ((int)$task_project === $value["id_project"]): ?> selected <?php endif ?> ><?=htmlspecialchars($value["project"]); ?></option>
       <?php endforeach ?>
     </select>
     <?php if (isset($errors['project'])): ?>

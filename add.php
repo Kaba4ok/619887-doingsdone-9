@@ -67,6 +67,10 @@
                 $file = $file_url;
             }
 
+            if (mb_strlen($_POST["name"]) > 70) {
+                $errors["name"] = "Значение данного поля не должно содержать более 70 символов";
+            }
+
             //проверка на наличие ошибок
             if (count($errors)) {
                 $content = include_template("add.php", ["projects" => $projects, "errors" => $errors]);

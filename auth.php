@@ -2,6 +2,10 @@
 
     require_once("init.php");
 
+    if (!empty($_SESSION)) {
+        header("Location: index.php");
+    }
+
     $content = include_template("auth.php", []);
 
     if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -23,7 +27,7 @@
         if (!empty($user)) {
             //проверка на соответствие введенного пароля данным из БД
             if (password_verify($_POST["password"], $password)) {
-                $_SESSION['user'] = $user;
+                $_SESSION["user"] = $user;
             } else {
                 $errors["password"] = "Неверный пароль";
                 $errors["password_invalid"] = true;
