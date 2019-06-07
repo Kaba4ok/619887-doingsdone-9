@@ -17,6 +17,22 @@
     }
 
     /**
+     * Получает из массива с данными проектов массив с id проектов
+     * @param array $projects Массив с данными проектов
+     * @return array Id проектов
+     */
+    function get_projects_ids($projects)
+    {
+        $projects_ids = [];
+
+        foreach ($projects as $key => $value) {
+            $projects_ids[] = $value["id_project"];
+        }
+
+        return $projects_ids;
+    }
+
+    /**
      * Подключает шаблон, передает туда данные и возвращает итоговый HTML контент
      * @param string $name Путь к файлу шаблона относительно папки templates
      * @param array $data Ассоциативный массив с данными для шаблона
