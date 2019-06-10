@@ -10,7 +10,7 @@
     <?php $error_class = isset($errors['name']) ? "form__input--error" : ""; ?>
     <label class="form__label" for="name">Название <sup>*</sup></label>
 
-    <input class="form__input <?= $error_class; ?>" type="text" name="name" id="name" value="<?= $task_name ?>" placeholder="Введите название">
+    <input class="form__input <?= $error_class; ?>" type="text" name="name" id="name" value="<?= htmlspecialchars($task_name) ?>" placeholder="Введите название">
     <?php if (isset($errors['name'])): ?>
     <p class="form__message"><?=$errors['name']; ?></p>
     <?php endif; ?>
@@ -34,7 +34,7 @@
     <?php $error_class = isset($errors['date']) ? "form__input--error" : ""; ?>
     <label class="form__label" for="date">Дата выполнения</label>
 
-    <input class="form__input form__input--date <?= $error_class; ?>" type="text" name="date" id="date" value="<?= $task_date ?>" placeholder="Введите дату в формате ГГГГ-ММ-ДД">
+    <input class="form__input form__input--date <?= $error_class; ?>" type="text" name="date" id="date" value="<?= htmlspecialchars($task_date) ?>" placeholder="Введите дату в формате ГГГГ-ММ-ДД">
     <?php if (isset($errors['date'])): ?>
     <p class="form__message"><?=$errors['date']; ?></p>
     <?php endif; ?>

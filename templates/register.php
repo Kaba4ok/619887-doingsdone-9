@@ -36,7 +36,7 @@
     <div class="form__row">
         <label class="form__label" for="name">Имя <sup>*</sup></label>
 
-        <input class="form__input <?php if (!empty($errors['name'])): ?> form__input--error <?php endif ?>" type="text" name="name" id="name" value="<?= $name ?>" placeholder="Введите имя">
+        <input class="form__input <?php if (!empty($errors['name'])): ?> form__input--error <?php endif ?>" type="text" name="name" id="name" value="<?= htmlspecialchars($name) ?>" placeholder="Введите имя">
 
         <?php if (!empty($errors["name"])): ?>
             <p class="form__message"><?= $errors["name"] ?></p>

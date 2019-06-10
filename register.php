@@ -58,7 +58,7 @@
             //формирование запроса на добавление данных из формы в БД и редирект на главную страницу в случае отсутствия ошибок
             $user_email = $_POST["email"];
             $user_password = $hash_password;
-            $user_name = htmlspecialchars($_POST["name"]);
+            $user_name = $_POST["name"];
 
             add_users($connect, [$user_email, $user_password, $user_name]);
 

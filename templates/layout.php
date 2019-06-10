@@ -24,7 +24,7 @@
 
                 <div class="main-header__side-item user-menu">
                     <div class="user-menu__data">
-                        <p><?= $db_user_name ?></p>
+                        <p><?= htmlspecialchars($db_user_name) ?></p>
 
                         <a href="../logout.php">Выйти</a>
                     </div>
@@ -43,9 +43,9 @@
                             if (isset($_GET['id_project']) && (int)$_GET['id_project'] === $value['id_project']): ?>
                                 main-navigation__list-item--active <?php endif ?>">
                             <a class="main-navigation__list-item-link" href="/index.php?id_project=<?= $value['id_project'] ?><?php if (isset($_GET['show_completed'])): ?>&show_completed=<?= $_GET['show_completed'] ?><?php endif ?>">
-                                <?=htmlspecialchars($value["project"]); ?>
+                                <?= htmlspecialchars($value["project"]); ?>
                             </a>
-                            <span class="main-navigation__list-item-count"><?= $value["tasks_count"]; ?></span>
+                            <span class="main-navigation__list-item-count"><?= htmlspecialchars($value["tasks_count"]); ?></span>
                         </li>
                         <?php endforeach ?>
                     </ul>

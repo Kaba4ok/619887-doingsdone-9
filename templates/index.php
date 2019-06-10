@@ -37,17 +37,17 @@
                 <td class="task__select">
                     <label class="checkbox task__checkbox">
                         <input class="checkbox__input visually-hidden task__checkbox" type="checkbox" value="<?= $value['id_task'] ?>" <?php if($value["status"]): ?> checked <?php endif ?>>
-                        <span class="checkbox__text"><?=htmlspecialchars($value["task"]); ?></span>
+                        <span class="checkbox__text"><?= htmlspecialchars($value["task"]); ?></span>
                     </label>
                 </td>
 
                 <td class="task__file">
                     <?php if(isset($value["file"]) && $value["file"] !== null): ?>
-                    <a class="download-link" href="<?= $value['file'] ?>" download><?= get_file_name($value["file"]); ?></a>
+                    <a class="download-link" href="<?= $value['file'] ?>" download><?= htmlspecialchars(get_file_name($value["file"])); ?></a>
                     <?php endif ?>
                 </td>
 
-                <td class="task__date"><?=$value["deadline"]; ?></td>
+                <td class="task__date"><?=htmlspecialchars($value["deadline"]); ?></td>
             </tr>
         <?php endif ?>
     <?php endforeach ?>
