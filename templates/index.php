@@ -47,7 +47,7 @@
                     <?php endif ?>
                 </td>
 
-                <td class="task__date"><?=htmlspecialchars($value["deadline"]); ?></td>
+                <td class="task__date"><?= htmlspecialchars($value["deadline"]); ?></td>
             </tr>
         <?php endif ?>
     <?php endforeach ?>
