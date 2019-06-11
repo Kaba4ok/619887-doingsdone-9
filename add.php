@@ -90,4 +90,6 @@
         $page = include_template("layout.php", ["content" => $content, "projects" => $projects, "title" => $title, "db_user_name" => $db_user_name]);
 
         print($page);
+    } else {
+        header("Location: guest.php");
     }
